@@ -1,0 +1,35 @@
+---
+title: "EPINOR Annual Meeting 2021"
+subtitle: "Part III - Bayesian Analysis with R"
+author: "Øystein Sørensen"
+institute: "University of Oslo"
+date: "2021/11/02"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+
+# Outline for Part III
+
+- An overview of tools for Bayesian analysis
+
+- Stan, brms
+
+- 15 minute break
+
+- Hands-on exercises
+
+---
+
+class: center, middle
+
+# Thanks!
+
+Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
+
+The chakra comes from [remark.js](https://remarkjs.com), [**knitr**](https://yihui.org/knitr/), and [R Markdown](https://rmarkdown.rstudio.com).
