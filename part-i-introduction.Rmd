@@ -26,6 +26,83 @@ output:
 
 ---
 
+# Thomas Bayes (1701 - 1761)
+
+<center>
+<img src="figures/Thomas_Bayes.gif">
+</center>
+
+---
+class: middle, center
+
+<img src="figures/Bayes_Essay.jpg">
+
+---
+
+# Bayes' theorem
+
+> If there be two subsequent events, the probability of the second b/N and the probability of both together P/N, and it being first discovered that the second event has also happened, from hence I guess that the first event has also happened, the probability I am right is P/b.
+
+With symbols<sup>1</sup>
+
+$$P(A|B) = \frac{P(A \cap B)} {P(B)}$$
+- $P(B)$: probability that the second event happens.
+- $P(A \cap B)$: probability that both events happens.
+- $P(A)$: probability that the first event happens.
+
+
+.footnote[<sup>1</sup>Stigler, S.M. (1982), Thomas Bayes's Bayesian Inference. Journal of the Royal Statistical Society: Series A (General), 145: 250-258. https://doi.org/10.2307/2981538.]
+
+
+---
+
+# Bayes' theorem
+
+Considering Bayes' theorem again
+
+$$P(A|B) = \frac{P(A \cap B)} {P(B)}$$
+
+We know that $P(A \cap B) = P(B \cap A)$, since "A and B happen" is the same as "B and A happen". Hence, we also have
+
+$$P(B|A) = \frac{P(B \cap A)}{P(A)} = \frac{P(A \cap B)}{P(A)}$$
+
+By some replacement, it follows that
+
+$$P(A|B) = \frac{P(B|A)P(A)}{P(B)}$$
+
+---
+
+# Bayes' theorem
+
+<center>
+<img src="figures/Rapid_Test.jpg", width=300>
+</center>
+
+For a random person taken from the population, what is the probability of disease (event $A$) given positive test (event $B$)?
+
+- Sensitivity: $P(B|A)$. 
+- Base rate: $P(A)$. 
+- Positive test: $P(B) = P(B|\bar{A}) + P(B|A) = \{1-P(\bar{B}|\bar{A})\} + P(B|A)$.
+  - $P(\bar{B}|\bar{A})$ is the specificity.
+
+--
+
+$$P(A|B) = \frac{P(B|A)P(A)}{1-P(\bar{B}|\bar{A}) + P(B|A)}$$
+
+
+---
+
+
+# Example
+
+```{r}
+data("ToothGrowth")
+summary(lm(len ~ dose, data = ToothGrowth))
+```
+
+
+---
+
 class: center, middle
 
 # Thanks!

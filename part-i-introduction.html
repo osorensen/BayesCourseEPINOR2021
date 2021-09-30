@@ -4,9 +4,9 @@
     <title>EPINOR Annual Meeting 2021</title>
     <meta charset="utf-8" />
     <meta name="author" content="Øystein Sørensen" />
-    <script src="libs/header-attrs/header-attrs.js"></script>
-    <link href="libs/remark-css/default.css" rel="stylesheet" />
-    <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
   </head>
   <body>
     <textarea id="source">
@@ -31,6 +31,105 @@ class: center, middle, inverse, title-slide
 - Short break (5 min)
 
 - Priors and posteriors - a complete example with Bayesian linear regression
+
+---
+
+# Thomas Bayes (1701 - 1761)
+
+&lt;center&gt;
+&lt;img src="figures/Thomas_Bayes.gif"&gt;
+&lt;/center&gt;
+
+---
+class: middle, center
+
+&lt;img src="figures/Bayes_Essay.jpg"&gt;
+
+---
+
+# Bayes' theorem
+
+&gt; If there be two subsequent events, the probability of the second b/N and the probability of both together P/N, and it being first discovered that the second event has also happened, from hence I guess that the first event has also happened, the probability I am right is P/b.
+
+With symbols&lt;sup&gt;1&lt;/sup&gt;
+
+`$$P(A|B) = \frac{P(A \cap B)} {P(B)}$$`
+- `\(P(B)\)`: probability that the second event happens.
+- `\(P(A \cap B)\)`: probability that both events happens.
+- `\(P(A)\)`: probability that the first event happens.
+
+
+.footnote[&lt;sup&gt;1&lt;/sup&gt;Stigler, S.M. (1982), Thomas Bayes's Bayesian Inference. Journal of the Royal Statistical Society: Series A (General), 145: 250-258. https://doi.org/10.2307/2981538.]
+
+
+---
+
+# Bayes' theorem
+
+Considering Bayes' theorem again
+
+`$$P(A|B) = \frac{P(A \cap B)} {P(B)}$$`
+
+We know that `\(P(A \cap B) = P(B \cap A)\)`, since "A and B happen" is the same as "B and A happen". Hence, we also have
+
+`$$P(B|A) = \frac{P(B \cap A)}{P(A)} = \frac{P(A \cap B)}{P(A)}$$`
+
+By some replacement, it follows that
+
+`$$P(A|B) = \frac{P(B|A)P(A)}{P(B)}$$`
+
+---
+
+# Bayes' theorem
+
+&lt;center&gt;
+&lt;img src="figures/Rapid_Test.jpg", width=300&gt;
+&lt;/center&gt;
+
+For a random person taken from the population, what is the probability of disease (event `\(A\)`) given positive test (event `\(B\)`)?
+
+- Sensitivity: `\(P(B|A)\)`. 
+- Base rate: `\(P(A)\)`. 
+- Positive test: `\(P(B) = P(B|\bar{A}) + P(B|A) = \{1-P(\bar{B}|\bar{A})\} + P(B|A)\)`.
+  - `\(P(\bar{B}|\bar{A})\)` is the specificity.
+
+--
+
+`$$P(A|B) = \frac{P(B|A)P(A)}{1-P(\bar{B}|\bar{A}) + P(B|A)}$$`
+
+
+---
+
+
+# Example
+
+
+```r
+data("ToothGrowth")
+summary(lm(len ~ dose, data = ToothGrowth))
+```
+
+```
+## 
+## Call:
+## lm(formula = len ~ dose, data = ToothGrowth)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -8.4496 -2.7406 -0.7452  2.8344 10.1139 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   7.4225     1.2601    5.89 2.06e-07 ***
+## dose          9.7636     0.9525   10.25 1.23e-14 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 4.601 on 58 degrees of freedom
+## Multiple R-squared:  0.6443,	Adjusted R-squared:  0.6382 
+## F-statistic: 105.1 on 1 and 58 DF,  p-value: 1.233e-14
+```
+
 
 ---
 
