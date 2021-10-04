@@ -46,3 +46,6 @@ ggsave("linear_model_posterior.png", width = 12, height = 6, units = "cm")
 
 as_draws_df(mod1, variable = "b_dose") %>% 
   summarise(mean(b_dose > 10))
+
+as_draws_df(mod2, variable = "b_dose") %>% 
+  summarise(mean(b_dose > 10))
