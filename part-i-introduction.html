@@ -267,16 +267,116 @@ class: middle, center
 
 `\(p(\text{data} | \beta)\)` is called the likelihood function. It's logarithm is given by `\(-\sum_{i=1}^{n} \{y_{i} - (\beta_{0} + \beta x_{i})\}^2\)`, which is the residual sum of squares. 
 
-Fixing the intercept at the estimate `\(\beta_{0} = 7.4225\)`, it looks like this. The point shows the linear regression estimate, which is at the very bottom.
+Fixing the intercept at the estimate `\(\beta_{0} = 7.4225\)`, it looks like this. The point shows the frequentist linear regression estimate, which is at the very bottom.
 
 ![](part-i-introduction_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
 
 
+---
+
+# Example - Bayesian version
+
+The prior, `\(p(\beta)\)`, quantifies our prior knowledge about the effect.
+
+Might come from, previous studies, common sense, physical knowledge, etc.
 
 
 ---
 
+layout: true
+
+# Example - Bayesian version
+
+---
+
+A quite common choice would be a uniform prior over some large range, e.g., `\([-1000, 1000]\)`, or even `\([-\infty, \infty]\)`. This means that all values in the range are considered equally likely a priori.
+
+
+
+![](part-i-introduction_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+
+- Convenient, but often very unrealistic. In this case `\(\beta\)` represents the effect of vitamin C dose on growth of teeth, and `\(\pm 1000\)` are probably impossible for a large number of reasons.
+
+
+---
+
+- Assume we consider the biology of the problem, and find that values of `\(\beta\)` beyond `\(\pm 50\)` are extremely unlikely. We can encode this with a normal prior, with standard deviation 25, so there is a 95 % probability that `\(\beta\)` is in `\([-50, 50]\)`. To avoid biasing the effect in a certain direction, we set the mean to zero.
+
+![](part-i-introduction_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
+
+
+---
+
+layout: false
+
+# Example - Bayesian version
+
+The final piece is the normalizing constant, `\(p(\text{data})\)`:
+
+`$$p(\beta | \text{data}) = \frac{p(\beta) p(\text{data}|\beta)}{ p(\text{data})}$$`
+
+Luckily, it does not contain `\(\beta\)`, so it's value does not affect our estimate of `\(\beta\)`. We write
+
+`$$p(\beta | \text{data}) \propto p(\beta) p(\text{data}|\beta)$$`
+and let the software deal with it.
+
+---
+
+# Example - Bayesian version
+
+The funny sign `\(\propto\)` means *is proportional to*, and the lack of a normalizing constant means that we can get *unnormalized* probabilities:
+
+
+| beta| Probability|
+|----:|-----------:|
+|    1|         4.5|
+|    2|         9.0|
+|    3|         7.0|
+
+
+--
+
+Normalization is straightforward in this case:
+
+
+| beta| Probability| Normalized prob.|
+|----:|-----------:|----------------:|
+|    1|         4.5|             0.22|
+|    2|         9.0|             0.44|
+|    3|         7.0|             0.34|
+
+
+---
+
+## Example - Bayesian version
+
+- Back to our linear regression. We have described the likelihood `\(p(\text{data}|\beta)\)`, priors `\(p(\beta)\)`, and the normalizing constant `\(p(\text{data})\)`. 
+
+- It all looks pretty similar.
+
+&lt;img src="linear_model_comparison.png"&gt;
+
+
+---
+
+## Example - Bayesian version
+
+- However, Bayesian models let us do much more afterwards, like plotting `\(p(\beta | \text{data})\)`
+
+&lt;img src="linear_model_posterior.png"&gt;
+
+---
+
+## Example - Bayesian version
+
+- Or asking: What is the probability that the true value of `\(\beta\)` is larger than 10?
+
+- Which turns out to be 40.7 %.
+
+---
+
 class: center, middle
+
 
 # Thanks!
 
