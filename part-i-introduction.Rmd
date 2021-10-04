@@ -14,6 +14,11 @@ output:
 ---
 
 
+```{r, echo=FALSE, message=FALSE}
+library(tidyverse)
+```
+
+
 # Outline for Part I
 
 - A brief history
@@ -61,44 +66,182 @@ $$P(A|B) = \frac{P(A \cap B)} {P(B)}$$
 Considering Bayes' theorem again
 
 $$P(A|B) = \frac{P(A \cap B)} {P(B)}$$
-
-We know that $P(A \cap B) = P(B \cap A)$, since "A and B happen" is the same as "B and A happen". Hence, we also have
+We know that $P(A \cap B) = P(B \cap A)$, since "A and B happen" is the same as "B and A happen". 
+--
+Hence, we also have
 
 $$P(B|A) = \frac{P(B \cap A)}{P(A)} = \frac{P(A \cap B)}{P(A)}$$
-
+--
 By some replacement, it follows that
 
 $$P(A|B) = \frac{P(B|A)P(A)}{P(B)}$$
 
 ---
 
-# Bayes' theorem
+# An application of Bayes' theorem
 
 <center>
 <img src="figures/Rapid_Test.jpg", width=300>
 </center>
 
-For a random person taken from the population, what is the probability of disease (event $A$) given positive test (event $B$)?
-
-- Sensitivity: $P(B|A)$. 
-- Base rate: $P(A)$. 
-- Positive test: $P(B) = P(B|\bar{A}) + P(B|A) = \{1-P(\bar{B}|\bar{A})\} + P(B|A)$.
-  - $P(\bar{B}|\bar{A})$ is the specificity.
-
---
-
-$$P(A|B) = \frac{P(B|A)P(A)}{1-P(\bar{B}|\bar{A}) + P(B|A)}$$
 
 
 ---
 
+# An application of Bayes' theorem
+
+For a random person taken from the population, what is the probability of disease (event $A$) given positive test (event $B$)?
+--
+
+- Sensitivity: $P(B|A)$, (positive test given sick). 
+
+- Base rate: $P(A)$ (sick). 
+
+- Positive test: $P(B) = P(B|\bar{A}) + P(B|A) = \{1-P(\bar{B}|\bar{A})\} + P(B|A)$.
+
+  - $P(\bar{B}|\bar{A})$ is the specificity (negative test given not sick).
+
+--
+
+We get the probability of being sick given a positive test:
+
+$$P(A|B) = \frac{P(B|A)P(A)}{1-P(\bar{B}|\bar{A}) + P(B|A)}$$
+
+- All statisticians agree about this.
+
+---
+
+class: middle, center 
+
+# Bayesian vs Frequentist statistics
+
+
+
+---
+
+# Example
+
+- Consider a simple dataset, `ToothGrowth`, which comes with `R`.
+
+```{r}
+data("ToothGrowth")
+head(ToothGrowth)
+```
+
+- `len` is length of tooth in guinea pigs.
+
+- `dose` is daily dose of vitamin C (mg/day)
+
+
+---
+
+# Example
+
+How is dose related to length?
+
+```{r}
+linreg <- lm(len ~ dose, data = ToothGrowth)
+```
+
+We get *frequentist* measures out:
+
+```{r}
+coef(summary(linreg))
+confint(linreg)
+```
+
+
+---
 
 # Example
 
 ```{r}
-data("ToothGrowth")
-summary(lm(len ~ dose, data = ToothGrowth))
+coef(summary(linreg))
 ```
+
+p-value `1.23e-14` (= $0.0000000000000123$) means that:
+
+> In a population where the true effect of `dose` on `len` is exactly zero, if we had taken a random sample of this size from the population a very large number of times and compute an estimate of the effect each time, we would expect the estimate to be larger than +/-9.76 in a fraction 0.0000000000000123 of the samples.
+
+This *frequentist* interpretation refers to hypothetical new random samples in a world where the true effect is zero.
+
+---
+
+# Example
+
+```{r}
+confint(linreg)
+```
+
+And for the confidence interval:
+
+> In a world where the true effect equals the estimated 9.76, if we took new random samples and fit new linear regressions a very large number of times, 95% of the estimates would be between 7.86 and 11.68.
+
+---
+
+# Example - Bayesian version
+
+- We have a linear model: $\text{length} = \beta_{0} + \beta \times \text{dose} + \epsilon$.
+
+- We want to quantify our *degree of belief* about $\beta$ after seeing the data: $p(\beta | \text{data})$.
+
+- Something like this?
+
+```{r, echo=FALSE, fig.width=6, fig.height=4, fig.align='center'}
+val <- seq(from = 3, to = 15, by = .1)
+plot(val, dnorm(val, mean = 9.5, sd = 2), type = "l",
+     xlab = expression(beta), ylab = "Probability")
+```
+
+---
+
+# Example - Bayesian version
+
+- Bayes' theorem: 
+
+$$p(\beta | \text{data}) = \frac{p(\beta) p(\text{data}|\beta)}{ p(\text{data})}$$
+
+- $p(\text{data}|\beta)$ is defined by the sum-of-squares.
+
+- $p(\text{data}) = \int p(\text{data}|\beta)p(\beta) \text{d}\beta$ is the normalizing constant.
+
+  - Think of it as the negative sum-of-squares for all possible values of $\beta$, weighted by the probability of getting that $\beta$.
+  
+- $p(\beta)$ is the controversial part. It is our $prior$ belief about $\beta$, before seeing the data.
+
+.footnote[We actually need to define a prior distribution for the residual standard deviation as well, but let's skip that for now.]
+
+---
+
+class: middle, center
+
+# Let's look at this piece by piece
+
+---
+
+# Example - Bayesian version
+
+$p(\text{data} | \beta)$ is called the likelihood function. It's logarithm is given by $-\sum_{i=1}^{n} \{y_{i} - (\beta_{0} + \beta x_{i})\}^2$, which is the residual sum of squares. 
+
+Fixing the intercept at the estimate $\beta_{0} = 7.4225$, it looks like this. The point shows the linear regression estimate, which is at the very bottom.
+
+```{r, echo=FALSE, fig.width=6, fig.height=4}
+plot_df <- ToothGrowth %>% 
+  mutate(beta0 = 7.4225, beta = list(seq(from = 3, to = 15, by = .1))) %>% 
+  unnest(cols = beta) %>% 
+  mutate(yhat = beta0 + beta * dose) %>% 
+  group_by(beta) %>% 
+  summarise(rss = sum((len - yhat)^2), .groups = "drop")
+
+ggplot(plot_df, aes(x = beta, y = rss)) + 
+  geom_line() + 
+  geom_point(data = tibble(beta = coef(linreg)[[2]], rss = sum(residuals(linreg)^2))) +
+  theme_classic() + 
+  xlab(expression(beta)) +
+  ylab("Residual sum of squares")
+```
+
+
 
 
 ---
