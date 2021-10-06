@@ -24,7 +24,6 @@ class: center, middle, inverse, title-slide
 
 
 
-
 # Outline for Part I
 
 - A brief history
@@ -34,6 +33,19 @@ class: center, middle, inverse, title-slide
 - Short break (5 min)
 
 - Priors and posteriors - a complete example with Bayesian linear regression
+
+
+---
+
+Also need some R packages.
+
+
+```r
+library(tidyverse)
+theme_set(theme_classic())
+```
+
+
 
 ---
 
@@ -125,7 +137,7 @@ class: middle, center
 
 ---
 
-# Example
+# Example - ToothGrowth data
 
 - Consider a simple dataset, `ToothGrowth`, which comes with `R`.
 
@@ -152,63 +164,72 @@ head(ToothGrowth)
 
 ---
 
-# Example
+# Visualization
 
-How is dose related to length?
+
+```r
+ggplot(ToothGrowth, aes(x = dose, y = len)) + 
+  geom_point()
+```
+
+![](part-i-introduction_files/figure-html/unnamed-chunk-3-1.svg)&lt;!-- --&gt;
+
+
+There seems to be a positive relationship, but how do we quantify our uncertainty?
+
+---
+
+# Linear regression
+
+A linear regression will quantify how much evidence we have:
 
 
 ```r
 linreg &lt;- lm(len ~ dose, data = ToothGrowth)
 ```
 
-We get *frequentist* measures out:
 
 
 ```r
-coef(summary(linreg))
+library(broom)
+tidy(linreg)
 ```
 
 ```
-##             Estimate Std. Error   t value     Pr(&gt;|t|)
-## (Intercept) 7.422500  1.2600826  5.890487 2.064211e-07
-## dose        9.763571  0.9525329 10.250114 1.232698e-14
+## # A tibble: 2 × 5
+##   term        estimate std.error statistic  p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)     7.42     1.26       5.89 2.06e- 7
+## 2 dose            9.76     0.953     10.3  1.23e-14
 ```
 
-```r
-confint(linreg)
-```
+---
 
-```
-##                2.5 %    97.5 %
-## (Intercept) 4.900171  9.944829
-## dose        7.856870 11.670273
-```
+# Interpretation of p-values
+
+How do we interpret the p-value `\(1.23 \times 10^{-14}\)` for the estimated effect `\(\hat{\beta}=9.76\)`?
+
+--
+
+We have two hypotheses:
+
+- H0: No effect of vitamin C on tooth growth, `\(\beta=0\)`.
+
+- H1: Effect of vitamin C on tooth growth, `\(\beta \neq 0\)`.
+
+--
+
+And we can say:
+
+- Assume H0 is true. If we take random samples of this size from the populations a very large number of times, the proportion of samples for which our estimate `\(|\hat{\beta}| &gt; 9.76\)` would go towards `\(1.23 \times 10^{-14}\)` (0.00000000000123 %).
+
+Hence, under H0 the expected **frequency** of seeing a deviation this big is `\(1.23 \times 10^{-14}\)`.
+
 
 
 ---
 
-# Example
-
-
-```r
-coef(summary(linreg))
-```
-
-```
-##             Estimate Std. Error   t value     Pr(&gt;|t|)
-## (Intercept) 7.422500  1.2600826  5.890487 2.064211e-07
-## dose        9.763571  0.9525329 10.250114 1.232698e-14
-```
-
-p-value `1.23e-14` (= `\(0.0000000000000123\)`) means that:
-
-&gt; In a population where the true effect of `dose` on `len` is exactly zero, if we had taken a random sample of this size from the population a very large number of times and compute an estimate of the effect each time, we would expect the estimate to be larger than +/-9.76 in a fraction 0.0000000000000123 of the samples.
-
-This *frequentist* interpretation refers to hypothetical new random samples in a world where the true effect is zero.
-
----
-
-# Example
+# Interpretation of confidence intervals
 
 
 ```r
@@ -221,39 +242,37 @@ confint(linreg)
 ## dose        7.856870 11.670273
 ```
 
-And for the confidence interval:
 
-&gt; In a world where the true effect equals the estimated 9.76, if we took new random samples and fit new linear regressions a very large number of times, 95% of the estimates would be between 7.86 and 11.68.
+- A 95% confidence interval is a thing which - when we repeatedly take random samples from the population - will contain the true value about 95% of the times.
 
----
-
-# Example - Bayesian version
-
-- We have a linear model: `\(\text{length} = \beta_{0} + \beta \times \text{dose} + \epsilon\)`.
-
-- We want to quantify our *degree of belief* about `\(\beta\)` after seeing the data: `\(p(\beta | \text{data})\)`.
-
-- Something like this?
-
-&lt;img src="part-i-introduction_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 
-# Example - Bayesian version
+# Bayesian linear regression
 
-- Bayes' theorem: 
+We have a linear model for the `ToothGrowth` data: 
+
+`$$\text{length} = \beta_{0} + \beta \times \text{dose} + \epsilon$$`
+
+---
+
+# Bayesian linear regression
+
+How can we use Bayes' theorem to say something about `\(\beta\)`?
 
 `$$p(\beta | \text{data}) = \frac{p(\beta) p(\text{data}|\beta)}{ p(\text{data})}$$`
 
-- `\(p(\text{data}|\beta)\)` is defined by the sum-of-squares.
+1. Our prior knowledge: `\(p(\beta)\)`
 
-- `\(p(\text{data}) = \int p(\text{data}|\beta)p(\beta) \text{d}\beta\)` is the normalizing constant.
+2. How likely it is to see the data we observed, for any given value of `\(\beta\)`: `\(p(\text{data}|\beta)\)`
 
-  - Think of it as the negative sum-of-squares for all possible values of `\(\beta\)`, weighted by the probability of getting that `\(\beta\)`.
-  
-- `\(p(\beta)\)` is the controversial part. It is our `\(prior\)` belief about `\(\beta\)`, before seeing the data.
+3. Normalizing constant: `\(p(\text{data})\)`.
 
-.footnote[We actually need to define a prior distribution for the residual standard deviation as well, but let's skip that for now.]
+
+1 + 2 + 3 give us `\(p(\beta|\text{data})\)`, the probability of any given `\(\beta\)`, taking the evidence in our data into account.
+
+.footnote[We actually need to say something about the residual standard deviation as well, but we'll deal with that later.]
+
 
 ---
 
@@ -263,46 +282,47 @@ class: middle, center
 
 ---
 
-# Example - Bayesian version
+# Piece 1 - The Prior
 
-`\(p(\text{data} | \beta)\)` is called the likelihood function. It's logarithm is given by `\(-\sum_{i=1}^{n} \{y_{i} - (\beta_{0} + \beta x_{i})\}^2\)`, which is the residual sum of squares. 
+The prior, `\(p(\beta)\)`, quantifies our prior knowledge about the effect under study. Must be defined **before** looking at the data, just like tests in a frequentist analysis must predefined to avoid p-hacking.
 
-Fixing the intercept at the estimate `\(\beta_{0} = 7.4225\)`, it looks like this. The point shows the frequentist linear regression estimate, which is at the very bottom.
+---
 
-![](part-i-introduction_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
+# Piece 1 - The Prior
+
+Assume we consider the biological nature of the problem, and find that `\(\beta\)`-values below -60 or above 60 are extremely unlikely. We also do not have any prior knowledge about the direction of the effect. 
+
+A convenient choice may then be a normal distribution with mean 0 and standard deviation `\(\sigma = 30\)`. Then `\(p(|\beta| &gt; 60) = 0.05\)`.
+
+![](part-i-introduction_files/figure-html/unnamed-chunk-7-1.svg)&lt;!-- --&gt;
 
 
 ---
 
-# Example - Bayesian version
+# Noninformative prior
 
-The prior, `\(p(\beta)\)`, quantifies our prior knowledge about the effect.
+Sometimes we have no idea, or we want to be "objective". Can use a uniform prior. Every possible value of `\(\beta\)` has a very very slight positive probability.
 
-Might come from, previous studies, common sense, physical knowledge, etc.
-
-
----
-
-layout: true
-
-# Example - Bayesian version
+![](part-i-introduction_files/figure-html/unnamed-chunk-8-1.svg)&lt;!-- --&gt;
 
 ---
 
-A quite common choice would be a uniform prior over some large range, e.g., `\([-1000, 1000]\)`, or even `\([-\infty, \infty]\)`. This means that all values in the range are considered equally likely a priori.
+# Likelihood
+
+`\(p(\text{data} | \beta)\)` is the likelihood. It is related to the residual sum of squares
+
+`$$RSS(\beta) = -\sum_{i=1}^{n} \{y_{i} - (\beta_{0} + \beta x_{i})\}^2$$` 
+
+.pull-left[
+
+![](part-i-introduction_files/figure-html/unnamed-chunk-9-1.svg)&lt;!-- --&gt;
+]
+.pull-right[
+![](part-i-introduction_files/figure-html/unnamed-chunk-10-1.svg)&lt;!-- --&gt;
 
 
+]
 
-![](part-i-introduction_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
-
-- Convenient, but often very unrealistic. In this case `\(\beta\)` represents the effect of vitamin C dose on growth of teeth, and `\(\pm 1000\)` are probably impossible for a large number of reasons.
-
-
----
-
-- Assume we consider the biology of the problem, and find that values of `\(\beta\)` beyond `\(\pm 50\)` are extremely unlikely. We can encode this with a normal prior, with standard deviation 25, so there is a 95 % probability that `\(\beta\)` is in `\([-50, 50]\)`. To avoid biasing the effect in a certain direction, we set the mean to zero.
-
-![](part-i-introduction_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
 
 
 ---
