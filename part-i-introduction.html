@@ -13,15 +13,61 @@
 class: center, middle, inverse, title-slide
 
 # EPINOR Annual Meeting 2021
-## Part I - Introduction to Bayesian Statistics
+## A Gentle Introduction to Bayesian Statistics
 ### Øystein Sørensen
-### University of Oslo
+### Department of Psychology, University of Oslo
 ### 2021/11/02
 
 ---
 
 
 
+
+
+# Short Bio
+
+
+
+---
+
+
+# Plan for the Day
+
+| Time | What |
+| --- | --- |
+| 10:00 - 11:30 | Part I - Introduction to Bayesian Statistics |
+| 11:30 - 12:30 | Lunch |
+| 12:30 - 14:00 | Part II - Bayesian Workflow for Data Analysis |
+| 14:15 - 15:15 | Part III - Bayesian Analysis with R |
+| 15:30 - 17:00 | Exercises with "brms" in R |
+
+
+
+- Please remember, comments and questions are **always** welcome!
+
+
+---
+
+# Setup
+
+For the R code in the presentations to work, we must run the following lines:
+
+
+```r
+library(tidyverse)
+theme_set(theme_classic())
+```
+
+.footnote[Wickham et al., (2019). Welcome to the Tidyverse. Journal of Open Source Software, 4(43), 1686, https://doi.org/10.21105/joss.01686]
+
+
+---
+
+class: inverse, middle, center
+
+# Part I - Introduction to Bayesian Statistics
+
+---
 
 
 # Outline for Part I
@@ -37,18 +83,6 @@ class: center, middle, inverse, title-slide
 
 ---
 
-Also need some R packages.
-
-
-```r
-library(tidyverse)
-theme_set(theme_classic())
-```
-
-
-
----
-
 # Thomas Bayes (1701 - 1761)
 
 &lt;center&gt;
@@ -56,7 +90,7 @@ theme_set(theme_classic())
 &lt;/center&gt;
 
 ---
-class: middle, center
+class: inverse, middle, center
 
 &lt;img src="figures/Bayes_Essay.jpg"&gt;
 
@@ -66,7 +100,7 @@ class: middle, center
 
 &gt; If there be two subsequent events, the probability of the second b/N and the probability of both together P/N, and it being first discovered that the second event has also happened, from hence I guess that the first event has also happened, the probability I am right is P/b.
 
-With symbols&lt;sup&gt;1&lt;/sup&gt;
+With symbols
 
 `$$P(A|B) = \frac{P(A \cap B)} {P(B)}$$`
 - `\(P(B)\)`: probability that the second event happens.
@@ -74,7 +108,7 @@ With symbols&lt;sup&gt;1&lt;/sup&gt;
 - `\(P(A)\)`: probability that the first event happens.
 
 
-.footnote[&lt;sup&gt;1&lt;/sup&gt;Stigler, S.M. (1982), Thomas Bayes's Bayesian Inference. Journal of the Royal Statistical Society: Series A (General), 145: 250-258. https://doi.org/10.2307/2981538.]
+.footnote[Stigler, S.M. (1982), Thomas Bayes's Bayesian Inference. Journal of the Royal Statistical Society: Series A (General), 145: 250-258. https://doi.org/10.2307/2981538.]
 
 
 ---
@@ -115,23 +149,42 @@ For a random person taken from the population, what is the probability of diseas
 
 - Base rate: `\(P(A)\)` (sick). 
 
-- Positive test: `\(P(B) = P(B|\bar{A}) + P(B|A) = \{1-P(\bar{B}|\bar{A})\} + P(B|A)\)`.
+- Positive test `\(P(B)\)`: 
 
-  - `\(P(\bar{B}|\bar{A})\)` is the specificity (negative test given not sick).
-
+  - Total probability equals probability given sick plus probability given not sick: `\(P(B) = P(B|\bar{A}) + P(B|A)\)`  
+  
 --
+
+  - Probability of positive test given not sick equals one minus probability of negative test given not sick: `\(P(B|\bar{A}) = 1-P(\bar{B}|\bar{A})\)`.
+
+  - `\(P(\bar{B}|\bar{A})\)` is the specificity.
+  
+--
+  
+  - We thus get `\(P(B) = \underbrace{\{1 - P(\bar{B}|\bar{A})\}}_{P(B|\bar{A})} + P(B|A)\)`
+  
+---
+
+# An application of Bayes' theorem
+
 
 We get the probability of being sick given a positive test:
 
 `$$P(A|B) = \frac{P(B|A)P(A)}{1-P(\bar{B}|\bar{A}) + P(B|A)}$$`
 
-- All statisticians agree about this.
+--
+
+Why useful?
+
+$$\text{unknown thing} = \text{formula with known things} $$
+
+
 
 ---
 
-class: middle, center 
+class: inverse, middle, center 
 
-# Bayesian vs Frequentist statistics
+# Bayesian vs Frequentist Statistics
 
 
 
@@ -172,16 +225,16 @@ ggplot(ToothGrowth, aes(x = dose, y = len)) +
   geom_point()
 ```
 
-![](part-i-introduction_files/figure-html/unnamed-chunk-3-1.svg)&lt;!-- --&gt;
+&lt;img src="part-i-introduction_files/figure-html/unnamed-chunk-4-1.svg" style="display: block; margin: auto;" /&gt;
 
-
+???
 There seems to be a positive relationship, but how do we quantify our uncertainty?
 
 ---
 
-# Linear regression
+# Linear Regression
 
-A linear regression will quantify how much evidence we have:
+Linear regression estimates effect of dose on length.
 
 
 ```r
@@ -221,11 +274,22 @@ We have two hypotheses:
 
 And we can say:
 
-- Assume H0 is true. If we take random samples of this size from the populations a very large number of times, the proportion of samples for which our estimate `\(|\hat{\beta}| &gt; 9.76\)` would go towards `\(1.23 \times 10^{-14}\)` (0.00000000000123 %).
+- If H0 is true and we take random very many random datasets from the population, the magnitude `\(|\hat{\beta}|\)` would exceed 9.76 about `\(1.23 \times 10^{-14}\)` (0.00000000000123 %) of the times.
 
 Hence, under H0 the expected **frequency** of seeing a deviation this big is `\(1.23 \times 10^{-14}\)`.
 
 
+---
+
+# Some Points for Discussion
+
+- Is it ever possible that the null hypothesis is true? 
+
+  - Think of linear regression `\(y = \beta_{0} + \beta x + \epsilon\)` as an example, where `\(x\)` is some exposure and `\(y\)` is some outcome.
+
+--
+
+- What happens to p-values as we increase the sample size?
 
 ---
 
@@ -250,17 +314,24 @@ confint(linreg)
 
 # Bayesian linear regression
 
-We have a linear model for the `ToothGrowth` data: 
+We have a linear model for the `ToothGrowth` data:
 
-`$$\text{length} = \beta_{0} + \beta \times \text{dose} + \epsilon$$`
+`$$y = \beta_{0} + \beta x + \epsilon$$`
+
+`\(y\)` is the length and `\(x\)` is the dose.
 
 ---
 
 # Bayesian linear regression
 
-How can we use Bayes' theorem to say something about `\(\beta\)`?
+Can we use Bayes' theorem to say something about `\(\beta\)`?
 
-`$$p(\beta | \text{data}) = \frac{p(\beta) p(\text{data}|\beta)}{ p(\text{data})}$$`
+`$$\underbrace{p(\beta | \text{data})}_{\color{red}{\text{want to know}}} = \underbrace{\frac{p(\beta) p(\text{data}|\beta)}{ p(\text{data})}}_{\color{red}{\text{know?}}}$$`
+
+"data" is just a shorthand for "observed lengths at given doses".
+
+
+--
 
 1. Our prior knowledge: `\(p(\beta)\)`
 
@@ -269,32 +340,32 @@ How can we use Bayes' theorem to say something about `\(\beta\)`?
 3. Normalizing constant: `\(p(\text{data})\)`.
 
 
-1 + 2 + 3 give us `\(p(\beta|\text{data})\)`, the probability of any given `\(\beta\)`, taking the evidence in our data into account.
 
-.footnote[We actually need to say something about the residual standard deviation as well, but we'll deal with that later.]
 
 
 ---
 
-class: middle, center
+class: inverse, middle, center
 
-# Let's look at this piece by piece
-
----
-
-# Piece 1 - The Prior
-
-The prior, `\(p(\beta)\)`, quantifies our prior knowledge about the effect under study. Must be defined **before** looking at the data, just like tests in a frequentist analysis must predefined to avoid p-hacking.
+# Piece by piece
 
 ---
 
 # Piece 1 - The Prior
 
-Assume we consider the biological nature of the problem, and find that `\(\beta\)`-values below -60 or above 60 are extremely unlikely. We also do not have any prior knowledge about the direction of the effect. 
+Quantifies our prior knowledge about the effect under study. Must be defined **before** looking at the data, just like tests in a frequentist analysis must predefined to avoid p-hacking.
+
+---
+
+# Piece 1 - The Prior
+
+Assume we consider the biological nature of the problem, and find that `\(\beta\)`-values below -60 or above 60 are extremely unlikely. We also do not have any prior knowledge about the direction of the effect.
+
+--
 
 A convenient choice may then be a normal distribution with mean 0 and standard deviation `\(\sigma = 30\)`. Then `\(p(|\beta| &gt; 60) = 0.05\)`.
 
-![](part-i-introduction_files/figure-html/unnamed-chunk-7-1.svg)&lt;!-- --&gt;
+&lt;img src="part-i-introduction_files/figure-html/unnamed-chunk-8-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -303,25 +374,28 @@ A convenient choice may then be a normal distribution with mean 0 and standard d
 
 Sometimes we have no idea, or we want to be "objective". Can use a uniform prior. Every possible value of `\(\beta\)` has a very very slight positive probability.
 
-![](part-i-introduction_files/figure-html/unnamed-chunk-8-1.svg)&lt;!-- --&gt;
+&lt;img src="part-i-introduction_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
 # Likelihood
 
-`\(p(\text{data} | \beta)\)` is the likelihood. It is related to the residual sum of squares
+`\(p(\text{data} | \beta)\)` is the likelihood. For linear regression it is related to the residual sum of squares
 
-`$$RSS(\beta) = -\sum_{i=1}^{n} \{y_{i} - (\beta_{0} + \beta x_{i})\}^2$$` 
+`$$RSS(\beta) = \sum_{i=1}^{n} \{y_{i} - (\beta_{0} + \beta x_{i})\}^2$$` 
 
 .pull-left[
 
-![](part-i-introduction_files/figure-html/unnamed-chunk-9-1.svg)&lt;!-- --&gt;
+&lt;img src="part-i-introduction_files/figure-html/unnamed-chunk-10-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
-![](part-i-introduction_files/figure-html/unnamed-chunk-10-1.svg)&lt;!-- --&gt;
+&lt;img src="part-i-introduction_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ]
+
+
+- What is the red dot?
 
 
 
@@ -370,9 +444,9 @@ Normalization is straightforward in this case:
 
 ## Example - Bayesian version
 
-- Back to our linear regression. We have described the likelihood `\(p(\text{data}|\beta)\)`, priors `\(p(\beta)\)`, and the normalizing constant `\(p(\text{data})\)`. 
+- Back to our linear regression. We have described the likelihood `\(p(\text{data}|\beta),\)` priors `\(p(\beta),\)` and the normalizing constant `\(p(\text{data})\)`. 
 
-- It all looks pretty similar.
+- Estimates and confidence intervals look similar:
 
 &lt;img src="linear_model_comparison.png"&gt;
 
@@ -383,7 +457,9 @@ Normalization is straightforward in this case:
 
 - However, Bayesian models let us do much more afterwards, like plotting `\(p(\beta | \text{data})\)`
 
-&lt;img src="linear_model_posterior.png"&gt;
+&lt;center&gt;
+&lt;img src="linear_model_posterior.png", width=400&gt;
+&lt;/center&gt;
 
 ---
 
@@ -391,7 +467,43 @@ Normalization is straightforward in this case:
 
 - Or asking: What is the probability that the true value of `\(\beta\)` is larger than 10?
 
-- Which turns out to be 40.7 %.
+
+&lt;center&gt;
+&lt;img src="linear_model_posterior_gt10.png", width=400&gt;
+&lt;/center&gt;
+
+`$$p(\beta &gt; 10| \text{data}) = 0.4$$`
+
+---
+
+class: inverse, middle, center
+
+# Summary of Bayesian vs Frequentist Statistics
+
+
+---
+
+# Bayesian vs Frequentist Statistics
+
+- Frequentist
+
+  - p-values interpreted in light of "how often would this happen if H0 was true and we sampled data again and again"?
+  
+  - Similarly for confidence intervals
+  
+- Bayesian
+
+  - Posterior distribution quantifies our degree of belief after seeing the data. Should agree with frequentist values if we sample data again and again.
+  
+  - Requires specifying the prior distribution, and works less out-of-the-box.
+  
+
+---
+
+class: inverse, middle, center
+
+# Examples of Bayesian Statistics in Epidemiology
+
 
 ---
 

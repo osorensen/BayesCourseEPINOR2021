@@ -1,4 +1,5 @@
 library(brms)
+library(latex2exp)
 library(bayesplot)
 library(tidyverse)
 library(glue)
@@ -6,7 +7,7 @@ theme_set(theme_classic())
 
 # Model with weakly informative prior
 mod1 <- brm(len ~ dose, data = ToothGrowth, 
-            prior = prior_string("normal(0, 25)", class = "b", coef = "dose"))
+            prior = prior_string("normal(0, 30)", class = "b", coef = "dose"))
 
 # Model with uniform prior on -1000, 1000
 mod2 <- brm(len ~ dose, data = ToothGrowth, 
@@ -31,21 +32,34 @@ plot_df <- map_df(list(mod1, mod2), ~ fixef(.x)["dose", ]) %>%
 ggplot(plot_df, aes(x = Model, y = Estimate, ymin = `Q2.5`, ymax = `Q97.5`)) + 
   geom_point() + 
   geom_errorbar(width = .1) + 
-  coord_flip()
+  coord_flip() + 
+  xlab("")
 
 ggsave("linear_model_comparison.png", width = 12, height = 6, units = "cm")
 
+dens <- as_draws_df(mod1, variable = "b_dose")$b_dose %>% 
+  density()
 
-mcmc_dens(mod1, pars = "b_dose") +
-  ggtitle("Posterior density") +
-  xlab(expression(beta)) + 
-  ylab("Probability")
+plot_df <- tibble(x = dens$x, y = dens$y)
 
-ggsave("linear_model_posterior.png", width = 12, height = 6, units = "cm")
+ggplot(plot_df, aes(x = x, y = y)) + 
+  geom_line() + 
+  xlab(expression(beta)) +
+  ylab(latex2exp::TeX("$p(\\beta | data)$")) +
+  ggtitle(latex2exp::TeX("Posterior for $\\beta$"))
+  
+ggsave("linear_model_posterior.png", width = 8, height = 6, units = "cm")
 
+plot_df %>% 
+  summarise(sum(y[x > 10]) / sum(y))
 
-as_draws_df(mod1, variable = "b_dose") %>% 
-  summarise(mean(b_dose > 10))
+ggplot(plot_df, aes(x = x, y = y)) + 
+  geom_line() + 
+  geom_area(data = filter(plot_df, x > 10), fill = "blue", alpha = .5) +
+  geom_text(data = tibble(x = 10.6, y = .1, label = "40%"), aes(x = x, y = y, label = label),
+            color = "white") +
+  xlab(expression(beta)) +
+  ylab(latex2exp::TeX("$p(\\beta | data)$")) +
+  ggtitle(latex2exp::TeX("Posterior for $\\beta$"))
 
-as_draws_df(mod2, variable = "b_dose") %>% 
-  summarise(mean(b_dose > 10))
+ggsave("linear_model_posterior_gt10.png", width = 8, height = 6, units = "cm")
