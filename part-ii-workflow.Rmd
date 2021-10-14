@@ -1,8 +1,8 @@
 ---
 title: "EPINOR Annual Meeting 2021"
-subtitle: "Part II - A Bayesian Workflow for Data Analysis"
+subtitle: "A Gentle Introduction to Bayesian Statistics"
 author: "Øystein Sørensen"
-institute: "University of Oslo"
+institute: "Department of Psychology, University of Oslo"
 date: "2021/11/02"
 output:
   xaringan::moon_reader:
@@ -13,10 +13,89 @@ output:
       countIncrementalSlides: false
 ---
 
+```{r, echo=FALSE}
+knitr::opts_chunk$set(fig.align = "center")
+```
 
-# Outline for Part II
+```{r, echo=FALSE, message=FALSE}
+library(tidyverse)
+```
 
-Step-by-step guide of the Bayesian analytic process.
+
+---
+
+class: inverse, middle, center
+
+# Part II - Bayesian Workflow for Data Analysis
+
+
+---
+
+# Bayesian Workflow?
+
+Gelman et al. (2021) write
+
+> Using Bayesian inference to solve real-world problems requires not only statistical skills, subject matter knowledge, and programming, but also awareness of the decisions made in the process of data analysis. All of these aspects can be understood as part of a tangled workflow of applied Bayesian statistics.
+
+.footnote[Gelman, A., Vehtari, A., Simpson, D., Margossian, C. C., Carpenter, B., Yao, Y., Kennedy, L., Gabry, J., Bürkner, P.-C., & Modrák, M. (2020). Bayesian Workflow. ArXiv:2011.01808 [Stat]. http://arxiv.org/abs/2011.01808]
+
+
+---
+
+# Phases of a Statistical Workflow
+
+(a) Exploratory data analysis to aid in choosing initial model.
+
+(b) Quantify prior knowledge.
+
+(c) Check that the computations work correctly.
+
+(d) Check that the model fits the data well.
+
+(e) Compare to other more or less complicated models.
+
+.footnote[Gabry, J., Simpson, D., Vehtari, A., Betancourt, M., & Gelman, A. (2019). Visualization in Bayesian workflow. Journal of the Royal Statistical Society: Series A (Statistics in Society), 182(2), 389–402. https://doi.org/10.1111/rssa.12378]
+
+
+---
+
+# Example Data
+
+Data from Low Birth Weight Study, used by Hosmer and Lemeshow (2000).
+
+```{r, echo=FALSE, message=FALSE}
+dat <- read_csv("data/bwt.csv", col_types = "lddll")
+```
+
+
+```{r}
+head(dat)
+```
+
+
+
+.footnote[David W. Hosmer and Stanley Lemeshow (2000). Applied Logistic Regression, Second Edition. John Wiley & Sons, Inc. ISBN:9780471356325. https://doi.org/10.1002/0471722146]
+
+
+---
+
+# Example Data
+
+```{r}
+head(dat)
+```
+
+- **Low**: Did the child have birth weight below 2500 grams?
+- **Age**: Age of mother.
+- **LWT**: Weight of mother at last menstrual period (kg).
+- **Smoker**: Does mother smoke?
+- **Hypertension**: Does mother have high blood pressure?
+
+---
+
+# Example Data
+
+
 
 ---
 

@@ -442,7 +442,7 @@ tibble(beta = c(1, 2, 3), Probability = c(4.5, 9, 7)) %>%
 
 - Estimates and confidence intervals look similar:
 
-<img src="linear_model_comparison.png">
+<img src="figures/linear_model_comparison.png">
 
 
 ---
@@ -452,7 +452,7 @@ tibble(beta = c(1, 2, 3), Probability = c(4.5, 9, 7)) %>%
 - However, Bayesian models let us do much more afterwards, like plotting $p(\beta | \text{data})$
 
 <center>
-<img src="linear_model_posterior.png", width=400>
+<img src="figures/linear_model_posterior.png", width=400>
 </center>
 
 ---
@@ -463,13 +463,49 @@ tibble(beta = c(1, 2, 3), Probability = c(4.5, 9, 7)) %>%
 
 
 <center>
-<img src="linear_model_posterior_gt10.png", width=400>
+<img src="figures/linear_model_posterior_gt10.png", width=400>
 </center>
 
 $$p(\beta > 10| \text{data}) = 0.4$$
 
 ---
+layout: true
 
+## What's the effect of adding data?
+
+---
+
+<center>
+<img src="figures/linreg_increment_1.png", width=400>
+</center>
+
+---
+
+<center>
+<img src="figures/linreg_increment_2.png", width=400>
+</center>
+
+---
+
+<center>
+<img src="figures/linreg_increment_3.png", width=400>
+</center>
+
+---
+
+<center>
+<img src="figures/linreg_increment_4.png", width=400>
+</center>
+
+---
+
+<center>
+<img src="figures/linreg_increment_5.png", width=400>
+</center>
+
+
+---
+layout: false
 class: inverse, middle, center
 
 # Summary of Bayesian vs Frequentist Statistics
