@@ -33,6 +33,7 @@ class: inverse, middle, center
 # Part II - Bayesian Workflow for Data Analysis
 
 
+
 ---
 
 # Bayesian Workflow?
@@ -63,15 +64,14 @@ Gelman et al. (2021) write
 
 ---
 
-# Example Data
+# Birth Weight Data
 
 Data from Low Birth Weight Study, used by Hosmer and Lemeshow (2000).
 
 
 
-
-
 ```r
+dat &lt;- readRDS("data/bwt.rds")
 head(dat)
 ```
 
@@ -94,7 +94,7 @@ head(dat)
 
 ---
 
-# Example Data
+# Birth Weight Data
 
 
 ```r
@@ -121,8 +121,84 @@ head(dat)
 
 ---
 
-# Example Data
+# Birth Weight Data
 
+Research question:
+
+- Is weight of mother at last menstrual period related to whether the child has birth weight below 2500 grams?
+
+Possible confounding factors are age, smoking status, and hypertension.
+
+---
+
+# (a) Exploratory data analysis
+
+There seems to be some relationship between mother's weight and low birthweight.
+
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-6-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# (a) Exploratory data analysis
+
+Older mother's tend to weigh more.
+
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-7-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# (a) Exploratory data analysis
+
+Minimal correlation between mother's weight and smoking status.
+
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-8-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# (a) Exploratory data analysis
+
+Positive association between hypertension and weight.
+
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# (a) Exploratory data analysis
+
+Logistic regression model seems appropriate.
+
+- Initial model of the form 
+
+`Low ~ LWT`
+
+- Gradually extend the model to include additional covariates. 
+
+- Most complex model becomes 
+
+`Low ~ LWT + Age + Smoker + Hypertension`.
+
+
+---
+
+# (b) Quantify prior knowledge
+
+Prior predictive simulations:
+
+- Giving values to the parameters of the prior distribution is hard. We can circumvent the problem by rather looking at what type of data are implied by the prior.
+
+
+---
+
+# (b) Quantify prior knowledge
+
+Consider simplest logistic regression model
+
+`$$P(Low) = \text{logit}\left(\beta_{0} + \beta_{LWT} LWT\right)$$`
+
+Sample parameters from the prior and then sample data given the parameters.
 
 
 ---

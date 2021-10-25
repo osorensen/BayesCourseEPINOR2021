@@ -498,7 +498,7 @@ tibble(beta = c(1, 2, 3), Probability = c(4.5, 9, 7)) %>%
 
 ---
 
-## Example - Bayesian version
+# Example - Bayesian version
 
 - Back to our linear regression. We have described the likelihood $p(\text{data}|\beta),$ priors $p(\beta),$ and the normalizing constant $p(\text{data})$. 
 
@@ -509,7 +509,7 @@ tibble(beta = c(1, 2, 3), Probability = c(4.5, 9, 7)) %>%
 
 ---
 
-## Posterior Distribution
+# Posterior Distribution
 
 - However, Bayesian models let us do much more afterwards, like plotting $p(\beta | \text{data})$
 
@@ -519,7 +519,7 @@ tibble(beta = c(1, 2, 3), Probability = c(4.5, 9, 7)) %>%
 
 ---
 
-## Posterior Distribution
+# Posterior Distribution
 
 - Or asking: What is the probability that the true value of $\beta$ is larger than 10?
 
@@ -532,7 +532,7 @@ $$p(\beta > 10| \text{data}) = 0.4$$
 
 ---
 
-## Posterior Distribution
+# Posterior Distribution
 
 Again back to Greenland
 
@@ -544,7 +544,7 @@ This is the typical Bayesian interpretation of probability. Long term frequency 
 
 ---
 
-## Posterior Confidence Interval
+# Posterior Confidence Interval
 
 The 95 % posterior interval for $\beta$, $[7.8, 11.7]$, are such that after analyzing the data, we would give $19:1$ odds that the true effect is between these two numbers.
 
@@ -557,7 +557,7 @@ The 95 % posterior interval for $\beta$, $[7.8, 11.7]$, are such that after anal
 ---
 layout: true
 
-## What's the effect of adding data?
+# What's the effect of adding data?
 
 ---
 

@@ -28,6 +28,10 @@ class: inverse, middle, center
 
 # Part II - Bayesian Workflow for Data Analysis
 
+```{r, message=FALSE, echo=FALSE}
+library(tidyverse)
+theme_set(theme_classic())
+```
 
 ---
 
@@ -59,16 +63,13 @@ Gelman et al. (2021) write
 
 ---
 
-# Example Data
+# Birth Weight Data
 
 Data from Low Birth Weight Study, used by Hosmer and Lemeshow (2000).
 
-```{r, echo=FALSE, message=FALSE}
-dat <- read_csv("data/bwt.csv", col_types = "lddll")
-```
-
 
 ```{r}
+dat <- readRDS("data/bwt.rds")
 head(dat)
 ```
 
@@ -79,7 +80,7 @@ head(dat)
 
 ---
 
-# Example Data
+# Birth Weight Data
 
 ```{r}
 head(dat)
@@ -93,8 +94,102 @@ head(dat)
 
 ---
 
-# Example Data
+# Birth Weight Data
 
+Research question:
+
+- Is weight of mother at last menstrual period related to whether the child has birth weight below 2500 grams?
+
+Possible confounding factors are age, smoking status, and hypertension.
+
+---
+
+# (a) Exploratory data analysis
+
+There seems to be some relationship between mother's weight and low birthweight.
+
+```{r, dev='svg', fig.align='center', fig.height=4, fig.width=4, echo=FALSE}
+ggplot(dat, aes(x = Low, y = LWT)) + 
+  geom_violin() + 
+  geom_boxplot(width = .1)
+```
+
+
+---
+
+# (a) Exploratory data analysis
+
+Older mother's tend to weigh more.
+
+```{r, dev='svg', fig.align='center', fig.height=4, fig.width=4, echo=FALSE}
+ggplot(dat, aes(x = Age, y = LWT)) + 
+  geom_point() + 
+  geom_smooth(method = lm, formula = y ~ x)
+```
+
+---
+
+# (a) Exploratory data analysis
+
+Minimal correlation between mother's weight and smoking status.
+
+```{r, dev='svg', fig.align='center', fig.height=4, fig.width=4, echo=FALSE}
+ggplot(dat, aes(x = Smoker, y = LWT)) + 
+  geom_violin() + 
+  geom_boxplot(width = .1) + 
+  labs(color = NULL)
+```
+
+
+---
+
+# (a) Exploratory data analysis
+
+Positive association between hypertension and weight.
+
+```{r, dev='svg', fig.align='center', fig.height=4, fig.width=4, echo=FALSE}
+ggplot(dat, aes(x = Hypertension, y = LWT)) + 
+  geom_violin() + 
+  geom_boxplot(width = .1) + 
+  labs(color = NULL)
+```
+
+
+---
+
+# (a) Exploratory data analysis
+
+Logistic regression model seems appropriate.
+
+- Initial model of the form 
+
+`Low ~ LWT`
+
+- Gradually extend the model to include additional covariates. 
+
+- Most complex model becomes 
+
+`Low ~ LWT + Age + Smoker + Hypertension`.
+
+
+---
+
+# (b) Quantify prior knowledge
+
+Prior predictive simulations:
+
+- Giving values to the parameters of the prior distribution is hard. We can circumvent the problem by rather looking at what type of data are implied by the prior.
+
+
+---
+
+# (b) Quantify prior knowledge
+
+Consider simplest logistic regression model
+
+$$P(Low) = \text{logit}\left(\beta_{0} + \beta_{LWT} LWT\right)$$
+
+Sample parameters from the prior and then sample data given the parameters.
 
 
 ---
