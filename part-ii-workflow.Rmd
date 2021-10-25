@@ -205,6 +205,54 @@ Logistic regression model seems appropriate.
 
 ---
 
+# (a) Exploratory data analysis
+
+The plots shown above may not have given too much information on how to build the model, but there are cases where it could have been crucial. 
+
+These simulated plots show such a situation:
+
+```{r, echo=FALSE}
+plot_df <- crossing(
+  Low = c(FALSE, TRUE),
+  Hypertension = c(FALSE, TRUE)
+) %>% 
+  mutate(n = c(50, 200, 200, 50)) %>% 
+  uncount(n) %>% 
+  mutate(
+    m = case_when(
+      Low & Hypertension ~ 45,
+      Low & !Hypertension ~ 55,
+      !Low & Hypertension ~ 50,
+      TRUE ~ 60
+    ),
+    LWT = rnorm(nrow(.), mean = m, sd = 3)
+  )
+
+p <- ggplot(plot_df, aes(x = Low, y = LWT)) + 
+  geom_violin() + 
+  coord_flip()
+
+```
+
+.pull-left[
+```{r, dev='svg', fig.align='center', fig.height=4, fig.width=5, echo=FALSE}
+p
+```
+]
+--
+.pull-right[
+```{r, dev='svg', fig.align='center', fig.height=4, fig.width=5, echo=FALSE}
+p  + facet_wrap(vars(Hypertension),
+                labeller = as_labeller(function(x) paste("Hypertension:", x)))
+```
+
+]
+
+The plots definitely suggest that we should include hypertension in the model.
+
+
+---
+
 # (b) Quantify prior knowledge
 
 Prior predictive simulations:
@@ -216,11 +264,210 @@ Prior predictive simulations:
 
 # (b) Quantify prior knowledge
 
-Consider simplest logistic regression model
+- Logistic regression model
 
 $$P(Low) = \text{logit}\left(\beta_{0} + \beta_{LWT} LWT\right)$$
 
-Sample parameters from the prior and then sample data given the parameters.
+- Consider two mothers, whose weights are $LWT_{1}$ and $LWT_{2}$. The odds ratio of low birthweight between the mother 1 and mother 2 is
+
+$$\exp\left\{(LWT_{1}-LWT_{2}) \beta_{LWT}\right\} = \exp\left\{\Delta_{W} \beta_{LWT}\right\}$$
+- We can use this to find a reasonable prior distribution for $\beta_{LWT}$.
+
+
+---
+
+# (b) Quantify prior knowledge
+
+An example to make what's coming seem more sensible. Assuming $\beta_{LWT}=-0.10$, we can make the following plot to interpret the effect:
+
+```{r, echo=FALSE}
+plot_df <- tibble(
+  delta_w = seq(from = -10, to = 10, by = 1),
+  odds_ratio = exp(-.1 * delta_w)
+)
+```
+
+.pull-left[
+```{r, dev='svg', fig.align='center', fig.height=3, fig.width=3, echo=FALSE}
+ggplot(plot_df, aes(x = delta_w, y = odds_ratio)) + 
+  geom_line() +
+  xlab("Weight difference between two women") + 
+  ylab("Odds ratio")
+```
+]
+.pull-right[
+```{r, dev='svg', fig.align='center', fig.height=3, fig.width=3, echo=FALSE}
+ggplot(plot_df, aes(x = delta_w, y = odds_ratio)) + 
+  geom_line() +
+  scale_y_log10() +
+  xlab("Weight difference between two women") + 
+  ylab("Log odds ratio")
+```
+]
+
+
+---
+
+# (b) Quantify prior knowledge
+
+Let's start by assuming a very wide prior distribution for $\beta_{LWT}$. Normal with mean 0 and standard deviation 100.
+
+```{r, dev='svg', fig.align='center', fig.height=3, fig.width=5, echo=FALSE}
+tibble(beta = seq(from = -300, to = 300, by = 1)) %>% 
+  mutate(prob = dnorm(beta, sd = 100)) %>% 
+  ggplot(aes(x = beta, y = prob)) + 
+  geom_line() +
+  xlab(TeX("$\\beta$")) + 
+  ylab(TeX("$P(\\beta)$"))
+```
+
+We would give 19:1 odds that the true $\beta_{LWT}$ is between -200 and +200. And 1:1 odds that $\beta_{LWT}$ is below or above 0.
+
+
+---
+
+# (b) Quantify prior knowledge
+
+Continuing with our wide prior distribution, here is what it means in terms of odds ratios:
+
+```{r, echo=FALSE}
+plot_df <- crossing(
+  delta_w = seq(from = -10, to = 10, by = 1),
+  beta = c(-200, 0, 200)
+  ) %>% 
+  mutate(odds_ratio = exp(beta * delta_w))
+```
+
+.pull-left[
+```{r, dev='svg', fig.align='center', fig.height=3, fig.width=3, echo=FALSE}
+ggplot(plot_df, aes(x = delta_w, y = odds_ratio, group = factor(beta), color = factor(beta))) + 
+  geom_line() +
+  xlab("Weight difference between two women") + 
+  ylab("Odds ratio") + 
+  labs(color = TeX("$\\beta$"))
+```
+]
+.pull-right[
+```{r, dev='svg', fig.align='center', fig.height=3, fig.width=3, echo=FALSE, warning=FALSE}
+ggplot(plot_df, aes(x = delta_w, y = odds_ratio, group = factor(beta), color = factor(beta))) + 
+  geom_line() +
+  scale_y_log10() +
+  xlab("Weight difference between two women") + 
+  ylab("Log odds ratio") +
+  labs(color = TeX("$\\beta$"))
+```
+]
+
+We would probably give more than 19:1 odds that the odds ratio is lower than this!
+
+
+---
+
+# (b) Quantify prior knowledge
+
+We can try to be a bit more informative. Let the prior be normal with mean 0 and standard deviation 1.
+
+```{r, dev='svg', fig.align='center', fig.height=3, fig.width=5, echo=FALSE}
+tibble(beta = seq(from = -3, to = 3, length.out = 100)) %>% 
+  mutate(prob = dnorm(beta, sd = 1)) %>% 
+  ggplot(aes(x = beta, y = prob)) + 
+  geom_line() +
+  xlab(TeX("$\\beta$")) + 
+  ylab(TeX("$P(\\beta)$"))
+```
+
+We would give 19:1 odds that the true $\beta_{LWT}$ is between -2 and +2. And 1:1 odds that $\beta_{LWT}$ is below or above 0.
+
+
+---
+
+# (b) Quantify prior knowledge
+
+It goes in the sensible direction, but the extreme ends are still crazy.
+
+```{r, echo=FALSE}
+plot_df <- crossing(
+  delta_w = seq(from = -10, to = 10, by = 1),
+  beta = c(-2, 0, 2)
+  ) %>% 
+  mutate(odds_ratio = exp(beta * delta_w))
+```
+
+.pull-left[
+```{r, dev='svg', fig.align='center', fig.height=3, fig.width=3, echo=FALSE}
+ggplot(plot_df, aes(x = delta_w, y = odds_ratio, group = factor(beta), color = factor(beta))) + 
+  geom_line() +
+  xlab("Weight difference between two women") + 
+  ylab("Odds ratio") + 
+  labs(color = TeX("$\\beta$"))
+```
+]
+.pull-right[
+```{r, dev='svg', fig.align='center', fig.height=3, fig.width=3, echo=FALSE, warning=FALSE}
+ggplot(plot_df, aes(x = delta_w, y = odds_ratio, group = factor(beta), color = factor(beta))) + 
+  geom_line() +
+  scale_y_log10() +
+  xlab("Weight difference between two women") + 
+  ylab("Log odds ratio") +
+  labs(color = TeX("$\\beta$"))
+```
+]
+
+We would probably give more than 19:1 odds that the odds ratio is lower than this!
+
+---
+
+# (b) Quantify prior knowledge
+
+We can try to be even a bit more informative. Let the prior be normal with mean 0 and standard deviation 0.2.
+
+```{r, dev='svg', fig.align='center', fig.height=3, fig.width=5, echo=FALSE}
+tibble(beta = seq(from = -.6, to = .6, length.out = 100)) %>% 
+  mutate(prob = dnorm(beta, sd = .2)) %>% 
+  ggplot(aes(x = beta, y = prob)) + 
+  geom_line() +
+  xlab(TeX("$\\beta$")) + 
+  ylab(TeX("$P(\\beta)$"))
+```
+
+We would give 19:1 odds that the true $\beta_{LWT}$ is between -0.4 and +0.4. And 1:1 odds that $\beta_{LWT}$ is below or above 0.
+
+
+---
+
+# (b) Quantify prior knowledge
+
+We still allow quite large effects within our 95 % prior limits, but the prior bets make much more sense now than for the initial prior that we tried.
+
+```{r, echo=FALSE}
+plot_df <- crossing(
+  delta_w = seq(from = -10, to = 10, by = 1),
+  beta = c(-.4, 0, .4)
+  ) %>% 
+  mutate(odds_ratio = exp(beta * delta_w))
+```
+
+.pull-left[
+```{r, dev='svg', fig.align='center', fig.height=3, fig.width=3, echo=FALSE}
+ggplot(plot_df, aes(x = delta_w, y = odds_ratio, group = factor(beta), color = factor(beta))) + 
+  geom_line() +
+  xlab("Weight difference between two women") + 
+  ylab("Odds ratio") + 
+  labs(color = TeX("$\\beta$"))
+```
+]
+.pull-right[
+```{r, dev='svg', fig.align='center', fig.height=3, fig.width=3, echo=FALSE, warning=FALSE}
+ggplot(plot_df, aes(x = delta_w, y = odds_ratio, group = factor(beta), color = factor(beta))) + 
+  geom_line() +
+  scale_y_log10() +
+  xlab("Weight difference between two women") + 
+  ylab("Log odds ratio") +
+  labs(color = TeX("$\\beta$"))
+```
+]
+
+We would probably give more than 19:1 odds that the odds ratio is lower than this!
 
 
 ---

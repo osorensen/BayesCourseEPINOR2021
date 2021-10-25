@@ -234,6 +234,28 @@ Logistic regression model seems appropriate.
 
 ---
 
+# (a) Exploratory data analysis
+
+The plots shown above may not have given too much information on how to build the model, but there are cases where it could have been crucial. 
+
+These simulated plots show such a situation:
+
+
+
+.pull-left[
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
+]
+--
+.pull-right[
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
+
+]
+
+The plots definitely suggest that we should include hypertension in the model.
+
+
+---
+
 # (b) Quantify prior knowledge
 
 Prior predictive simulations:
@@ -245,11 +267,116 @@ Prior predictive simulations:
 
 # (b) Quantify prior knowledge
 
-Consider simplest logistic regression model
+- Logistic regression model
 
 `$$P(Low) = \text{logit}\left(\beta_{0} + \beta_{LWT} LWT\right)$$`
 
-Sample parameters from the prior and then sample data given the parameters.
+- Consider two mothers, whose weights are `\(LWT_{1}\)` and `\(LWT_{2}\)`. The odds ratio of low birthweight between the mother 1 and mother 2 is
+
+`$$\exp\left\{(LWT_{1}-LWT_{2}) \beta_{LWT}\right\} = \exp\left\{\Delta_{W} \beta_{LWT}\right\}$$`
+- We can use this to find a reasonable prior distribution for `\(\beta_{LWT}\)`.
+
+
+---
+
+# (b) Quantify prior knowledge
+
+An example to make what's coming seem more sensible. Assuming `\(\beta_{LWT}=-0.10\)`, we can make the following plot to interpret the effect:
+
+
+
+.pull-left[
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-16-1.svg" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+
+---
+
+# (b) Quantify prior knowledge
+
+Let's start by assuming a very wide prior distribution for `\(\beta_{LWT}\)`. Normal with mean 0 and standard deviation 100.
+
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-18-1.svg" style="display: block; margin: auto;" /&gt;
+
+We would give 19:1 odds that the true `\(\beta_{LWT}\)` is between -200 and +200. And 1:1 odds that `\(\beta_{LWT}\)` is below or above 0.
+
+
+---
+
+# (b) Quantify prior knowledge
+
+Continuing with our wide prior distribution, here is what it means in terms of odds ratios:
+
+
+
+.pull-left[
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-20-1.svg" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-21-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+We would probably give more than 19:1 odds that the odds ratio is lower than this!
+
+
+---
+
+# (b) Quantify prior knowledge
+
+We can try to be a bit more informative. Let the prior be normal with mean 0 and standard deviation 1.
+
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-22-1.svg" style="display: block; margin: auto;" /&gt;
+
+We would give 19:1 odds that the true `\(\beta_{LWT}\)` is between -2 and +2. And 1:1 odds that `\(\beta_{LWT}\)` is below or above 0.
+
+
+---
+
+# (b) Quantify prior knowledge
+
+It goes in the sensible direction, but the extreme ends are still crazy.
+
+
+
+.pull-left[
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-24-1.svg" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-25-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+We would probably give more than 19:1 odds that the odds ratio is lower than this!
+
+---
+
+# (b) Quantify prior knowledge
+
+We can try to be even a bit more informative. Let the prior be normal with mean 0 and standard deviation 0.2.
+
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-26-1.svg" style="display: block; margin: auto;" /&gt;
+
+We would give 19:1 odds that the true `\(\beta_{LWT}\)` is between -0.4 and +0.4. And 1:1 odds that `\(\beta_{LWT}\)` is below or above 0.
+
+
+---
+
+# (b) Quantify prior knowledge
+
+We still allow quite large effects within our 95 % prior limits, but the prior bets make much more sense now than for the initial prior that we tried.
+
+
+
+.pull-left[
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-28-1.svg" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-29-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+We would probably give more than 19:1 odds that the odds ratio is lower than this!
 
 
 ---
