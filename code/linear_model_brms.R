@@ -64,6 +64,17 @@ ggplot(plot_df, aes(x = x, y = y)) +
 
 ggsave("figures/linear_model_posterior_gt10.png", width = 8, height = 6, units = "cm")
 
+ggplot(plot_df, aes(x = x, y = y)) + 
+  geom_line() + 
+  geom_area(data = filter(plot_df, between(x, 7.78, 11.65)), fill = "blue", alpha = .5) +
+  geom_text(data = tibble(x = 10, y = .1, label = "95%"), aes(x = x, y = y, label = label),
+            color = "white") +
+  xlab(expression(beta)) +
+  ylab(latex2exp::TeX("$p(\\beta | data)$")) +
+  ggtitle(latex2exp::TeX("Posterior for $\\beta$"))
+
+ggsave("figures/linear_model_posterior_CI.png", width = 8, height = 6, units = "cm")
+
 # Rerun with less data
 mod1a <- brm(len ~ dose, data = ToothGrowth[sample(nrow(ToothGrowth), 10), ], 
              prior = prior_string("normal(0, 30)", class = "b", coef = "dose"))

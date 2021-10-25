@@ -24,7 +24,13 @@ class: center, middle, inverse, title-slide
 
 
 
-# Short Bio
+# Who Am I?
+
+- Associate professor in statistics at the Department of Psychology, University of Oslo.
+
+- PhD in Biostatistics from 2015.
+
+- Pragmatic user of both Bayesian and classical statistical methods.
 
 
 
@@ -45,6 +51,8 @@ class: center, middle, inverse, title-slide
 
 - Please remember, comments and questions are **always** welcome!
 
+- Presentations and other course material available at https://github.com/osorensen/BayesCourseEPINOR2021
+
 
 ---
 
@@ -57,6 +65,7 @@ For the R code in the presentations to work, we must run the following lines:
 library(tidyverse)
 theme_set(theme_classic())
 ```
+
 
 .footnote[Wickham et al., (2019). Welcome to the Tidyverse. Journal of Open Source Software, 4(43), 1686, https://doi.org/10.21105/joss.01686]
 
@@ -103,9 +112,9 @@ class: inverse, middle, center
 With symbols
 
 `$$P(A|B) = \frac{P(A \cap B)} {P(B)}$$`
-- `\(P(B)\)`: probability that the second event happens.
-- `\(P(A \cap B)\)`: probability that both events happens.
-- `\(P(A)\)`: probability that the first event happens.
+- `\(P(B)\)`: probability that the second event happened.
+- `\(P(A \cap B)\)`: probability that both events happened.
+- `\(P(A|B)\)`: probability that the first event happened, given that the second has happened.
 
 
 .footnote[Stigler, S.M. (1982), Thomas Bayes's Bayesian Inference. Journal of the Royal Statistical Society: Series A (General), 145: 250-258. https://doi.org/10.2307/2981538.]
@@ -118,7 +127,7 @@ With symbols
 Considering Bayes' theorem again
 
 `$$P(A|B) = \frac{P(A \cap B)} {P(B)}$$`
-We know that `\(P(A \cap B) = P(B \cap A)\)`, since "A and B happen" is the same as "B and A happen". 
+We know that `\(P(A \cap B) = P(B \cap A)\)`, since "A and B happened" is the same as "B and A happened". 
 --
 Hence, we also have
 
@@ -151,17 +160,31 @@ For a random person taken from the population, what is the probability of diseas
 
 - Positive test `\(P(B)\)`: 
 
-  - Total probability equals probability given sick plus probability given not sick: `\(P(B) = P(B|\bar{A}) + P(B|A)\)`  
-  
 --
 
-  - Probability of positive test given not sick equals one minus probability of negative test given not sick: `\(P(B|\bar{A}) = 1-P(\bar{B}|\bar{A})\)`.
+  - Hard enough to deserve it's own slide.
+  
+  
+---
+  
+# Positive test
 
-  - `\(P(\bar{B}|\bar{A})\)` is the specificity.
+- Total probability equals probability given sick plus probability given not sick. `\(\bar{A}\)` bar means "not A": 
+  
+`$$P(B) = P(B|\bar{A}) + P(B|A)$$`
+--
+
+- If you are not sick, you can either get a positive test `\(B\)` or a negative test `\(\bar{B}\)`, so
+
+`$$P(B|\bar{A}) + P(\bar{B}|\bar{A}) = 1$$`
+`$$P(B|\bar{A}) = 1- P(\bar{B}|\bar{A})$$`
   
 --
   
-  - We thus get `\(P(B) = \underbrace{\{1 - P(\bar{B}|\bar{A})\}}_{P(B|\bar{A})} + P(B|A)\)`
+- We thus get 
+
+`$$P(B) = \underbrace{\{1 - P(\bar{B}|\bar{A})\}}_{P(B|\bar{A})} + P(B|A)$$`
+  
   
 ---
 
@@ -170,7 +193,7 @@ For a random person taken from the population, what is the probability of diseas
 
 We get the probability of being sick given a positive test:
 
-`$$P(A|B) = \frac{P(B|A)P(A)}{1-P(\bar{B}|\bar{A}) + P(B|A)}$$`
+`$$P(A|B) = \frac{P(B|A)P(A)}{P(B)} = \frac{P(B|A)P(A)}{1-P(\bar{B}|\bar{A}) + P(B|A)}$$`
 
 --
 
@@ -256,6 +279,8 @@ tidy(linreg)
 ## 2 dose            9.76     0.953     10.3  1.23e-14
 ```
 
+.footnote[David Robinson, Alex Hayes and Simon Couch (2021). broom: Convert Statistical Objects into Tidy Tibbles. R package version 0.7.9. https://CRAN.R-project.org/package=broom]
+
 ---
 
 # Interpretation of p-values
@@ -274,7 +299,7 @@ We have two hypotheses:
 
 And we can say:
 
-- If H0 is true and we take random very many random datasets from the population, the magnitude `\(|\hat{\beta}|\)` would exceed 9.76 about `\(1.23 \times 10^{-14}\)` (0.00000000000123 %) of the times.
+- If H0 is true and we take very many random datasets from the population, the magnitude `\(|\hat{\beta}|\)` would exceed 9.76 about `\(1.23 \times 10^{-14}\)` (0.00000000000123 %) of the times.
 
 Hence, under H0 the expected **frequency** of seeing a deviation this big is `\(1.23 \times 10^{-14}\)`.
 
@@ -283,7 +308,7 @@ Hence, under H0 the expected **frequency** of seeing a deviation this big is `\(
 
 # Some Points for Discussion
 
-- Is it ever possible that the null hypothesis is true? 
+- Is it ever possible that the null hypothesis is literally true? 
 
   - Think of linear regression `\(y = \beta_{0} + \beta x + \epsilon\)` as an example, where `\(x\)` is some exposure and `\(y\)` is some outcome.
 
@@ -293,7 +318,7 @@ Hence, under H0 the expected **frequency** of seeing a deviation this big is `\(
 
 ---
 
-# Interpretation of confidence intervals
+# Confidence intervals
 
 
 ```r
@@ -353,7 +378,12 @@ class: inverse, middle, center
 
 # Piece 1 - The Prior
 
-Quantifies our prior knowledge about the effect under study. Must be defined **before** looking at the data, just like tests in a frequentist analysis must predefined to avoid p-hacking.
+- Quantifies our prior knowledge about the effect under study. 
+
+- Should be defined **before** looking at the data, just like tests in a frequentist analysis should predefined to avoid p-hacking.
+
+  - Which of course often is impossible in practice, but still good to keep in mind.
+
 
 ---
 
@@ -370,32 +400,56 @@ A convenient choice may then be a normal distribution with mean 0 and standard d
 
 ---
 
-# Noninformative prior
+# Piece 1 - The Prior
 
-Sometimes we have no idea, or we want to be "objective". Can use a uniform prior. Every possible value of `\(\beta\)` has a very very slight positive probability.
+In the words of Greenland (2006), when the only parameter of interest is a  risk ratio
+
+&gt; ... my 95% prior limits are a pair of numbers `\(RR_{lower}\)` and `\(RR_{upper}\)` such that I would give `\(95 : 5 =  19:1\)` odds that the true risk ratio is between these numbers, i.e. `\(P(RR_{lower} \leq RR \leq RR_{upper}) = 0.95\)` if I disregarded the analysis data.
+
+
+.footnote[Greenland, Sander. “Bayesian Perspectives for Epidemiological Research: I. Foundations and Basic Methods.” International Journal of Epidemiology 35, no. 3 (June 1, 2006): 765–75. https://doi.org/10.1093/ije/dyi312.]
+
+---
+
+# Piece 1 - The Prior
+
+Following Greenland, our normal prior for `\(\beta\)` implies that we would give 19:1 odds that the true slope is between -60 and 60.
 
 &lt;img src="part-i-introduction_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
-# Likelihood
+# Noninformative prior
+
+Sometimes we have no idea, or we want to be "objective". Can use a uniform prior. Every possible value of `\(\beta\)` has a very very slight positive probability.
+
+&lt;img src="part-i-introduction_files/figure-html/unnamed-chunk-10-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Piece 2 - The Likelihood
+
+
+.pull-left[
 
 `\(p(\text{data} | \beta)\)` is the likelihood. For linear regression it is related to the residual sum of squares
 
 `$$RSS(\beta) = \sum_{i=1}^{n} \{y_{i} - (\beta_{0} + \beta x_{i})\}^2$$` 
 
-.pull-left[
+- What is the red dot? Is it related to frequentist linear regression?
 
-&lt;img src="part-i-introduction_files/figure-html/unnamed-chunk-10-1.svg" style="display: block; margin: auto;" /&gt;
+
 ]
 .pull-right[
+
+
 &lt;img src="part-i-introduction_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ]
 
 
-- What is the red dot?
+
 
 
 
@@ -403,7 +457,7 @@ Sometimes we have no idea, or we want to be "objective". Can use a uniform prior
 
 layout: false
 
-# Example - Bayesian version
+# Piece 3 - Normalizing Constant
 
 The final piece is the normalizing constant, `\(p(\text{data})\)`:
 
@@ -416,7 +470,7 @@ and let the software deal with it.
 
 ---
 
-# Example - Bayesian version
+# Piece 3 - Normalizing Constant
 
 The funny sign `\(\propto\)` means *is proportional to*, and the lack of a normalizing constant means that we can get *unnormalized* probabilities:
 
@@ -430,7 +484,7 @@ The funny sign `\(\propto\)` means *is proportional to*, and the lack of a norma
 
 --
 
-Normalization is straightforward in this case:
+Normalization is straightforward in this case. We must divide each number by 4.5+9+7=20.5:
 
 
 | beta| Probability| Normalized prob.|
@@ -453,7 +507,7 @@ Normalization is straightforward in this case:
 
 ---
 
-## Example - Bayesian version
+## Posterior Distribution
 
 - However, Bayesian models let us do much more afterwards, like plotting `\(p(\beta | \text{data})\)`
 
@@ -463,7 +517,7 @@ Normalization is straightforward in this case:
 
 ---
 
-## Example - Bayesian version
+## Posterior Distribution
 
 - Or asking: What is the probability that the true value of `\(\beta\)` is larger than 10?
 
@@ -473,6 +527,30 @@ Normalization is straightforward in this case:
 &lt;/center&gt;
 
 `$$p(\beta &gt; 10| \text{data}) = 0.4$$`
+
+---
+
+## Posterior Distribution
+
+Again back to Greenland
+
+&gt; The 50th percentile (median) of my posterior (...) is a number `\(RR_{median}\)` for which `\(P(RR \geq RR_{median} | data) =P(RR \leq RR_{median} | data)\)`, where (...) this bet is formulated in light of the analysis data. 
+
+&gt; Similarly, my 95% posterior limits are a pair of numbers `\(RR_{lower}\)` and `\(RR_{upper}\)` such that after analysing the data I would give `\(95:5=19:1\)` odds that the true relative risk is between these numbers, i.e. `\(P(RR_{lower} \leq RR \leq RR_{upper} | data) = 0.95\)`.
+
+This is the typical Bayesian interpretation of probability. Long term frequency under the null hypothesis is not mentioned.
+
+---
+
+## Posterior Confidence Interval
+
+The 95 % posterior interval for `\(\beta\)`, `\([7.8, 11.7]\)`, are such that after analyzing the data, we would give `\(19:1\)` odds that the true effect is between these two numbers.
+
+&lt;center&gt;
+&lt;img src="figures/linear_model_posterior_CI.png", width=400&gt;
+&lt;/center&gt;
+
+
 
 ---
 layout: true
@@ -534,11 +612,6 @@ class: inverse, middle, center
   - Requires specifying the prior distribution, and works less out-of-the-box.
   
 
----
-
-class: inverse, middle, center
-
-# Examples of Bayesian Statistics in Epidemiology
 
 
 ---
