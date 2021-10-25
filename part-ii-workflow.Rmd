@@ -106,12 +106,13 @@ Possible confounding factors are age, smoking status, and hypertension.
 
 # (a) Exploratory data analysis
 
-There seems to be some relationship between mother's weight and low birthweight.
+Women with lower weight have higher probabilty of low birthweight.
 
-```{r, dev='svg', fig.align='center', fig.height=4, fig.width=4, echo=FALSE}
-ggplot(dat, aes(x = Low, y = LWT)) + 
+```{r, dev='svg', fig.align='center', fig.height=3, fig.width=5, echo=FALSE}
+ggplot(dat, aes(x = Low, y = LWT, fill = Low)) + 
   geom_violin() + 
-  geom_boxplot(width = .1)
+  coord_flip() + 
+  theme(legend.position = "none")
 ```
 
 
@@ -119,41 +120,71 @@ ggplot(dat, aes(x = Low, y = LWT)) +
 
 # (a) Exploratory data analysis
 
-Older mother's tend to weigh more.
+.pull-left[
+Weaker relationship when stratifying by smoking status?
 
-```{r, dev='svg', fig.align='center', fig.height=4, fig.width=4, echo=FALSE}
-ggplot(dat, aes(x = Age, y = LWT)) + 
-  geom_point() + 
-  geom_smooth(method = lm, formula = y ~ x)
+```{r, dev='svg', fig.align='center', fig.height=3, fig.width=5, echo=FALSE}
+ggplot(dat, aes(x = Low, y = LWT, fill = Low)) + 
+  geom_violin() + 
+  coord_flip() + 
+  theme(legend.position = "none") + 
+  facet_wrap(vars(Smoker), labeller = as_labeller(function(x) paste("Smoker:", x)))
 ```
+]
+--
+.pull-right[
+
+Reasonable numbers in each group:
+
+```{r}
+dat %>% 
+  group_by(Low, Smoker) %>% 
+  count()
+```
+
+]
 
 ---
 
 # (a) Exploratory data analysis
 
-Minimal correlation between mother's weight and smoking status.
 
-```{r, dev='svg', fig.align='center', fig.height=4, fig.width=4, echo=FALSE}
-ggplot(dat, aes(x = Smoker, y = LWT)) + 
+.pull-left[
+What about hypertension?
+
+```{r, dev='svg', fig.align='center', fig.height=3, fig.width=5, echo=FALSE}
+ggplot(dat, aes(x = Low, y = LWT, fill = Low)) + 
   geom_violin() + 
-  geom_boxplot(width = .1) + 
-  labs(color = NULL)
+  coord_flip() + 
+  theme(legend.position = "none") + 
+  facet_wrap(vars(Hypertension), labeller = as_labeller(function(x) paste("Hypertension:", x)))
+```
+]
+--
+.pull-right[
+
+Small group sizes, so we should take the plots with a grain of salt.
+
+```{r}
+dat %>% 
+  group_by(Low, Hypertension) %>% 
+  count()
 ```
 
+]
 
 ---
 
 # (a) Exploratory data analysis
 
-Positive association between hypertension and weight.
+Hard to claim that there is a relationship between age and low birthweight:
 
-```{r, dev='svg', fig.align='center', fig.height=4, fig.width=4, echo=FALSE}
-ggplot(dat, aes(x = Hypertension, y = LWT)) + 
+```{r, dev='svg', fig.align='center', fig.height=3, fig.width=5, echo=FALSE}
+ggplot(dat, aes(x = Low, y = Age, fill = Low)) + 
   geom_violin() + 
-  geom_boxplot(width = .1) + 
-  labs(color = NULL)
+  coord_flip() + 
+  theme(legend.position = "none")
 ```
-
 
 ---
 
@@ -165,11 +196,11 @@ Logistic regression model seems appropriate.
 
 `Low ~ LWT`
 
-- Gradually extend the model to include additional covariates. 
+- We believe that smoking status might be an important covariate to include.
 
-- Most complex model becomes 
+- Will also include age, so the most complex model becomes:
 
-`Low ~ LWT + Age + Smoker + Hypertension`.
+`Low ~ LWT + Age + Smoker`.
 
 
 ---
