@@ -9,3 +9,7 @@ dplyr
 stringr
 forcats
 latex2exp
+Rcpp
+brms
+bayesplot
+BayesMallows

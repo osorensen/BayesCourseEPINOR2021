@@ -573,14 +573,135 @@ And rather not like this. Algorithm gets stuck at each random number.
 
 # (c) Check that the computations work correctly
 
-Other things you might come across:
+Other things you might have to consider:
 
-- $\hat{R}$
+- R-hat
 
 - Autocorrelation
 
 - Effective sample size
 
+- Divergent transitions
+
+
+---
+
+# (d) Check that the model fits the data well
+
+Prior predictive checks:
+
+- If the model fits the data well, simulating new observations from the model should give values close to the real data.
+
+---
+
+# Posterior predictive check 1
+
+When re-generating 100 random datasets with same weight of mother, using the estimated posterior distribution of $\beta_{LWT}$, are the proportions of low birthweight children comparable?
+
+<center>
+<img src="figures/pp_bar_example.png" height="300">
+</center>
+
+---
+
+# Posterior predictive check 2
+
+Logistic regression predicts the probability. Is the a relationship between the predicted probability and the error rate?
+
+<center>
+<img src="figures/pp_error_binned_example.png" height="400">
+</center>
+
+
+---
+
+class: inverse, middle, center
+
+# Predictive checks passed!
+
+Next a little reminder
+
+---
+
+# Phases of a Statistical Workflow
+
+(a) Exploratory data analysis to aid in choosing initial model.
+
+(b) Quantify prior knowledge.
+
+(c) Check that the computations work correctly.
+
+(d) Check that the model fits the data well.
+
+**(e) Compare to other more or less complicated models.**
+
+.footnote[Gabry, J., Simpson, D., Vehtari, A., Betancourt, M., & Gelman, A. (2019). Visualization in Bayesian workflow. Journal of the Royal Statistical Society: Series A (Statistics in Society), 182(2), 389–402. https://doi.org/10.1111/rssa.12378]
+
+
+---
+
+# (e) Compare to other more or less complicated models
+
+Let's add smoking status:
+
+$$P(Low) = \text{logit}\left(\beta_{0} + \beta_{LWT} \text{LWT} + \beta_{S} \text{Smoker}\right)$$
+
+You'll work through the prior for $\beta_{S}$ later.
+
+---
+
+# (e) Compare to other more or less complicated models
+
+A common way of comparing models is to assess how well they predict new data. Cross-validation and Akaike information criterion are ways of assessing this.
+
+Bayesian twists here as well:
+
+- Widely Applicable Information Criterion (WAIC)
+
+- Pareto smoothed importance sampling leave-one-out cross-validation (PSIS-LOO CV)<sup>1</sup>
+
+
+.footnote[<sup>1</sup> Try to say that loud.]
+
+---
+
+# WAIC
+
+```
+## Output of model 'LWT':
+## 
+## Computed from 4000 by 189 log-likelihood matrix
+## 
+##           Estimate   SE
+## elpd_waic   -116.5  5.6
+## p_waic         2.2  0.3
+## waic         233.0 11.3
+## 
+## Output of model 'LWT+Smoker':
+## 
+## Computed from 4000 by 189 log-likelihood matrix
+## 
+##           Estimate   SE
+## elpd_waic   -115.3  5.8
+## p_waic         3.1  0.3
+## waic         230.6 11.7
+## 
+## Model comparisons:
+##            elpd_diff se_diff
+## LWT+Smoker  0.0       0.0   
+## LWT        -1.2       2.2
+```
+
+---
+
+# LOO
+
+
+```
+##      elpd_diff se_diff
+## mod2  0.0       0.0   
+## mod  -1.2       2.2 
+```
 
 ---
 
