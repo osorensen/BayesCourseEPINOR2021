@@ -77,14 +77,14 @@ head(dat)
 
 ```
 ## # A tibble: 6 × 5
-##   Low     Age   LWT Smoker Hypertension
-##   &lt;lgl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;lgl&gt;  &lt;lgl&gt;       
-## 1 FALSE    19  82.6 FALSE  FALSE       
-## 2 FALSE    33  70.3 FALSE  FALSE       
-## 3 FALSE    20  47.6 TRUE   FALSE       
-## 4 FALSE    21  49.0 TRUE   FALSE       
-## 5 FALSE    18  48.5 TRUE   FALSE       
-## 6 FALSE    21  56.2 FALSE  FALSE
+##     Low   Age   LWT Smoker Hypertension
+##   &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;lgl&gt;  &lt;lgl&gt;       
+## 1     0    19  82.6 FALSE  FALSE       
+## 2     0    33  70.3 FALSE  FALSE       
+## 3     0    20  47.6 TRUE   FALSE       
+## 4     0    21  49.0 TRUE   FALSE       
+## 5     0    18  48.5 TRUE   FALSE       
+## 6     0    21  56.2 FALSE  FALSE
 ```
 
 
@@ -103,14 +103,14 @@ head(dat)
 
 ```
 ## # A tibble: 6 × 5
-##   Low     Age   LWT Smoker Hypertension
-##   &lt;lgl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;lgl&gt;  &lt;lgl&gt;       
-## 1 FALSE    19  82.6 FALSE  FALSE       
-## 2 FALSE    33  70.3 FALSE  FALSE       
-## 3 FALSE    20  47.6 TRUE   FALSE       
-## 4 FALSE    21  49.0 TRUE   FALSE       
-## 5 FALSE    18  48.5 TRUE   FALSE       
-## 6 FALSE    21  56.2 FALSE  FALSE
+##     Low   Age   LWT Smoker Hypertension
+##   &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;lgl&gt;  &lt;lgl&gt;       
+## 1     0    19  82.6 FALSE  FALSE       
+## 2     0    33  70.3 FALSE  FALSE       
+## 3     0    20  47.6 TRUE   FALSE       
+## 4     0    21  49.0 TRUE   FALSE       
+## 5     0    18  48.5 TRUE   FALSE       
+## 6     0    21  56.2 FALSE  FALSE
 ```
 
 - **Low**: Did the child have birth weight below 2500 grams?
@@ -162,12 +162,12 @@ dat %&gt;%
 ```
 ## # A tibble: 4 × 3
 ## # Groups:   Low, Smoker [4]
-##   Low   Smoker     n
-##   &lt;lgl&gt; &lt;lgl&gt;  &lt;int&gt;
-## 1 FALSE FALSE     86
-## 2 FALSE TRUE      44
-## 3 TRUE  FALSE     29
-## 4 TRUE  TRUE      30
+##     Low Smoker     n
+##   &lt;int&gt; &lt;lgl&gt;  &lt;int&gt;
+## 1     0 FALSE     86
+## 2     0 TRUE      44
+## 3     1 FALSE     29
+## 4     1 TRUE      30
 ```
 
 ]
@@ -197,12 +197,12 @@ dat %&gt;%
 ```
 ## # A tibble: 4 × 3
 ## # Groups:   Low, Hypertension [4]
-##   Low   Hypertension     n
-##   &lt;lgl&gt; &lt;lgl&gt;        &lt;int&gt;
-## 1 FALSE FALSE          125
-## 2 FALSE TRUE             5
-## 3 TRUE  FALSE           52
-## 4 TRUE  TRUE             7
+##     Low Hypertension     n
+##   &lt;int&gt; &lt;lgl&gt;        &lt;int&gt;
+## 1     0 FALSE          125
+## 2     0 TRUE             5
+## 3     1 FALSE           52
+## 4     1 TRUE             7
 ```
 
 ]
@@ -271,7 +271,7 @@ Prior predictive simulations:
 
 `$$P(Low) = \text{logit}\left(\beta_{0} + \beta_{LWT} LWT\right)$$`
 
-- Consider two mothers, whose weights are `\(LWT_{1}\)` and `\(LWT_{2}\)`. The odds ratio of low birthweight between the mother 1 and mother 2 is
+- Consider two mothers, whose weights are `\(LWT_{1}\)` and `\(LWT_{2}\)`. The odds ratio of low birthweight between mother 1 and mother 2 is
 
 `$$\exp\left\{(LWT_{1}-LWT_{2}) \beta_{LWT}\right\} = \exp\left\{\Delta_{W} \beta_{LWT}\right\}$$`
 - We can use this to find a reasonable prior distribution for `\(\beta_{LWT}\)`.
@@ -297,12 +297,13 @@ An example to make what's coming seem more sensible. Assuming `\(\beta_{LWT}=-0.
 
 # (b) Quantify prior knowledge
 
-Let's start by assuming a very wide prior distribution for `\(\beta_{LWT}\)`. Normal with mean 0 and standard deviation 100.
+Let's start by assuming a very wide prior distribution for `\(\beta_{LWT}\)`&lt;sup&gt;1&lt;/sup&gt;. Normal with mean 0 and standard deviation 100.
 
 &lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-18-1.svg" style="display: block; margin: auto;" /&gt;
 
 We would give 19:1 odds that the true `\(\beta_{LWT}\)` is between -200 and +200. And 1:1 odds that `\(\beta_{LWT}\)` is below or above 0.
 
+.footnote[&lt;sup&gt;1&lt;/sup&gt;This is a very common thing to do.]
 
 ---
 
@@ -376,7 +377,117 @@ We still allow quite large effects within our 95 % prior limits, but the prior b
 &lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-29-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
-We would probably give more than 19:1 odds that the odds ratio is lower than this!
+Seems kind of reasonable to give 19:1 odds that the odds ratio is somewhere between the red and the blue curves?
+
+---
+
+class: inverse, middle, center 
+
+# Now to step (c) of the Bayesian workflow
+
+This requires some unavoidable math, but I'll try to be gentle
+
+---
+
+# (c) Check that the computations work correctly
+
+Why need we care about computations??
+
+
+---
+
+# (c) Check that the computations work correctly
+
+Consider the frequentist logistic regression model:
+
+
+```r
+mod &lt;- glm(Low ~ LWT, data = dat, family = binomial())
+```
+
+
+Lots of things going on in the background which we don't need to care about:
+
+- Iteratively reweighted least squares
+- C and Fortran libraries for solving matrix equations
+- Derivatives of first and second order
+- etc etc etc
+
+Very mature technology. Fisher had to care about these things. We don't.
+
+
+---
+
+# (c) Check that the computations work correctly
+
+Estimation of Bayesian models requires more attention. We care about the posterior for `\(\beta_{LWT}\)`, 
+
+`$$p(\beta_{LWT} | \text{data}) = \frac{p(\beta_{LWT}) p(\text{data} | \beta_{LWT})}{p(\text{data})}$$`
+
+If we have the prior `\(p(\beta_{LWT})\)` and the likelihood `\(p(\text{data} | \beta_{LWT})\)` we can obtain samples from the posterior distribution using something called Monte Carlo sampling.
+
+
+---
+
+class: inverse
+
+# Monte Carlo Sampling?
+
+&lt;center&gt;
+&lt;img src="figures/metropolis-hastings.jpg"&gt;
+&lt;/center&gt;
+
+
+---
+
+# Monte Carlo Sampling?
+
+.pull-left[
+- Monte Carlo sampling, typically Metropolis-Hastings algorithms, give us a large sample from the posterior distribution.
+
+- From here we need to derive things like posterior mean, standard deviation, confidence intervals, etc.
+
+- R packages can solve a lot, but some knowledge of the algorithms is need.
+]
+.pull-right[
+&lt;center&gt;
+&lt;img src="figures/posterior_example.png"&gt;
+&lt;/center&gt;
+]
+
+---
+
+# (c) Check traceplot
+
+It should look random, like this.
+
+&lt;center&gt;
+&lt;img src="figures/trace_plot_example.png" height="300"&gt;
+&lt;/center&gt;
+
+
+---
+
+# (c) Check traceplot
+
+And rather not like this. Algorithm gets stuck at each random number.
+
+&lt;center&gt;
+&lt;img src="figures/bad_trace_plot_example.png" height="300"&gt;
+&lt;/center&gt;
+
+
+---
+
+# (c) Check that the computations work correctly
+
+Other things you might come across:
+
+- `\(\hat{R}\)`
+
+- Autocorrelation
+
+- Effective sample size
 
 
 ---

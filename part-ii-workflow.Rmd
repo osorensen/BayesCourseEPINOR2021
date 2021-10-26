@@ -15,10 +15,12 @@ output:
 
 ```{r, echo=FALSE}
 knitr::opts_chunk$set(fig.align = "center")
+knitr::opts_chunk$set(cache = TRUE)
 ```
 
 ```{r, echo=FALSE, message=FALSE}
 library(tidyverse)
+library(latex2exp)
 ```
 
 
@@ -268,7 +270,7 @@ Prior predictive simulations:
 
 $$P(Low) = \text{logit}\left(\beta_{0} + \beta_{LWT} LWT\right)$$
 
-- Consider two mothers, whose weights are $LWT_{1}$ and $LWT_{2}$. The odds ratio of low birthweight between the mother 1 and mother 2 is
+- Consider two mothers, whose weights are $LWT_{1}$ and $LWT_{2}$. The odds ratio of low birthweight between mother 1 and mother 2 is
 
 $$\exp\left\{(LWT_{1}-LWT_{2}) \beta_{LWT}\right\} = \exp\left\{\Delta_{W} \beta_{LWT}\right\}$$
 - We can use this to find a reasonable prior distribution for $\beta_{LWT}$.
@@ -291,7 +293,7 @@ plot_df <- tibble(
 ```{r, dev='svg', fig.align='center', fig.height=3, fig.width=3, echo=FALSE}
 ggplot(plot_df, aes(x = delta_w, y = odds_ratio)) + 
   geom_line() +
-  xlab("Weight difference between two women") + 
+  xlab("Weight difference") + 
   ylab("Odds ratio")
 ```
 ]
@@ -300,7 +302,7 @@ ggplot(plot_df, aes(x = delta_w, y = odds_ratio)) +
 ggplot(plot_df, aes(x = delta_w, y = odds_ratio)) + 
   geom_line() +
   scale_y_log10() +
-  xlab("Weight difference between two women") + 
+  xlab("Weight difference") + 
   ylab("Log odds ratio")
 ```
 ]
@@ -310,7 +312,7 @@ ggplot(plot_df, aes(x = delta_w, y = odds_ratio)) +
 
 # (b) Quantify prior knowledge
 
-Let's start by assuming a very wide prior distribution for $\beta_{LWT}$. Normal with mean 0 and standard deviation 100.
+Let's start by assuming a very wide prior distribution for $\beta_{LWT}$<sup>1</sup>. Normal with mean 0 and standard deviation 100.
 
 ```{r, dev='svg', fig.align='center', fig.height=3, fig.width=5, echo=FALSE}
 tibble(beta = seq(from = -300, to = 300, by = 1)) %>% 
@@ -323,6 +325,7 @@ tibble(beta = seq(from = -300, to = 300, by = 1)) %>%
 
 We would give 19:1 odds that the true $\beta_{LWT}$ is between -200 and +200. And 1:1 odds that $\beta_{LWT}$ is below or above 0.
 
+.footnote[<sup>1</sup>This is a very common thing to do.]
 
 ---
 
@@ -342,7 +345,7 @@ plot_df <- crossing(
 ```{r, dev='svg', fig.align='center', fig.height=3, fig.width=3, echo=FALSE}
 ggplot(plot_df, aes(x = delta_w, y = odds_ratio, group = factor(beta), color = factor(beta))) + 
   geom_line() +
-  xlab("Weight difference between two women") + 
+  xlab("Weight difference") + 
   ylab("Odds ratio") + 
   labs(color = TeX("$\\beta$"))
 ```
@@ -352,7 +355,7 @@ ggplot(plot_df, aes(x = delta_w, y = odds_ratio, group = factor(beta), color = f
 ggplot(plot_df, aes(x = delta_w, y = odds_ratio, group = factor(beta), color = factor(beta))) + 
   geom_line() +
   scale_y_log10() +
-  xlab("Weight difference between two women") + 
+  xlab("Weight difference") + 
   ylab("Log odds ratio") +
   labs(color = TeX("$\\beta$"))
 ```
@@ -397,7 +400,7 @@ plot_df <- crossing(
 ```{r, dev='svg', fig.align='center', fig.height=3, fig.width=3, echo=FALSE}
 ggplot(plot_df, aes(x = delta_w, y = odds_ratio, group = factor(beta), color = factor(beta))) + 
   geom_line() +
-  xlab("Weight difference between two women") + 
+  xlab("Weight difference") + 
   ylab("Odds ratio") + 
   labs(color = TeX("$\\beta$"))
 ```
@@ -407,7 +410,7 @@ ggplot(plot_df, aes(x = delta_w, y = odds_ratio, group = factor(beta), color = f
 ggplot(plot_df, aes(x = delta_w, y = odds_ratio, group = factor(beta), color = factor(beta))) + 
   geom_line() +
   scale_y_log10() +
-  xlab("Weight difference between two women") + 
+  xlab("Weight difference") + 
   ylab("Log odds ratio") +
   labs(color = TeX("$\\beta$"))
 ```
@@ -451,7 +454,7 @@ plot_df <- crossing(
 ```{r, dev='svg', fig.align='center', fig.height=3, fig.width=3, echo=FALSE}
 ggplot(plot_df, aes(x = delta_w, y = odds_ratio, group = factor(beta), color = factor(beta))) + 
   geom_line() +
-  xlab("Weight difference between two women") + 
+  xlab("Weight difference") + 
   ylab("Odds ratio") + 
   labs(color = TeX("$\\beta$"))
 ```
@@ -461,13 +464,122 @@ ggplot(plot_df, aes(x = delta_w, y = odds_ratio, group = factor(beta), color = f
 ggplot(plot_df, aes(x = delta_w, y = odds_ratio, group = factor(beta), color = factor(beta))) + 
   geom_line() +
   scale_y_log10() +
-  xlab("Weight difference between two women") + 
+  xlab("Weight difference") + 
   ylab("Log odds ratio") +
   labs(color = TeX("$\\beta$"))
 ```
 ]
 
-We would probably give more than 19:1 odds that the odds ratio is lower than this!
+Seems kind of reasonable to give 19:1 odds that the odds ratio is somewhere between the red and the blue curves?
+
+---
+
+class: inverse, middle, center 
+
+# Now to step (c) of the Bayesian workflow
+
+This requires some unavoidable math, but I'll try to be gentle
+
+---
+
+# (c) Check that the computations work correctly
+
+Why need we care about computations??
+
+
+---
+
+# (c) Check that the computations work correctly
+
+Consider the frequentist logistic regression model:
+
+```{r, eval=FALSE}
+mod <- glm(Low ~ LWT, data = dat, family = binomial())
+```
+
+
+Lots of things going on in the background which we don't need to care about:
+
+- Iteratively reweighted least squares
+- C and Fortran libraries for solving matrix equations
+- Derivatives of first and second order
+- etc etc etc
+
+Very mature technology. Fisher had to care about these things. We don't.
+
+
+---
+
+# (c) Check that the computations work correctly
+
+Estimation of Bayesian models requires more attention. We care about the posterior for $\beta_{LWT}$, 
+
+$$p(\beta_{LWT} | \text{data}) = \frac{p(\beta_{LWT}) p(\text{data} | \beta_{LWT})}{p(\text{data})}$$
+
+If we have the prior $p(\beta_{LWT})$ and the likelihood $p(\text{data} | \beta_{LWT})$ we can obtain samples from the posterior distribution using something called Monte Carlo sampling.
+
+
+---
+
+class: inverse
+
+# Monte Carlo Sampling?
+
+<center>
+<img src="figures/metropolis-hastings.jpg">
+</center>
+
+
+---
+
+# Monte Carlo Sampling?
+
+.pull-left[
+- Monte Carlo sampling, typically Metropolis-Hastings algorithms, give us a large sample from the posterior distribution.
+
+- From here we need to derive things like posterior mean, standard deviation, confidence intervals, etc.
+
+- R packages can solve a lot, but some knowledge of the algorithms is need.
+]
+.pull-right[
+<center>
+<img src="figures/posterior_example.png">
+</center>
+]
+
+---
+
+# (c) Check traceplot
+
+It should look random, like this.
+
+<center>
+<img src="figures/trace_plot_example.png" height="300">
+</center>
+
+
+---
+
+# (c) Check traceplot
+
+And rather not like this. Algorithm gets stuck at each random number.
+
+<center>
+<img src="figures/bad_trace_plot_example.png" height="300">
+</center>
+
+
+---
+
+# (c) Check that the computations work correctly
+
+Other things you might come across:
+
+- $\hat{R}$
+
+- Autocorrelation
+
+- Effective sample size
 
 
 ---

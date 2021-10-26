@@ -8,6 +8,7 @@ dat %>%
   select(Low, Age, LWT, Smoker, Hypertension) %>% 
   mutate(
     across(c(Age, LWT), ~ as.numeric(str_extract(., "[:digit:]+"))),
-    LWT = 0.45359237 * LWT
+    LWT = 0.45359237 * LWT,
+    Low = as.integer(Low)
   ) %>% 
   saveRDS("data/bwt.rds")
