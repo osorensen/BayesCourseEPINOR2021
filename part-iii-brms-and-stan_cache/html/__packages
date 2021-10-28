@@ -1,3 +1,16 @@
 base
+tidyverse
+ggplot2
+tibble
+tidyr
+readr
+purrr
+dplyr
+stringr
+forcats
+glue
+broom
+patchwork
+latex2exp
 Rcpp
 brms
