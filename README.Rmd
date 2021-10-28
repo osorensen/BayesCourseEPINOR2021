@@ -8,6 +8,16 @@ output:
 
 This repository will contain course material for the one-day course "A Gentle Introduction to Bayesian Statistics" at the [Epinor Annual Meeting 2021](https://en.uit.no/forskning/forskningsgrupper/nyheter/artikkel?p_document_id=476300&sub_id=744901). 
 
+The tentative plan for the day is as follows. Links to the course material will be added once it's ready.
+
+| Time | What |
+| --- | --- |
+| 10:00 - 11:30 | Part I - Introduction to Bayesian Statistics |
+| 11:30 - 12:30 | Lunch |
+| 12:30 - 14:00 | Part II - Bayesian Workflow for Data Analysis |
+| 14:15 - 15:15 | Part III - Bayesian Analysis with R |
+| 15:30 - 17:00 | Exercises with "brms" in R |
+
 The course material is not quite ready yet, but below are some instructions for those who want to have the 'brms' packages properly installed before we start.
 
 # Setup
