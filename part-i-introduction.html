@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>EPINOR Annual Meeting 2021</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Øystein Sørensen" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# EPINOR Annual Meeting 2021
+## A Gentle Introduction to Bayesian Statistics
+### Øystein Sørensen
+### Department of Psychology, University of Oslo
+### 2021/11/02
+
+---
+
+
+
+
+
+# Who Am I?
+
+- Associate professor in statistics at the Department of Psychology, University of Oslo.
+
+- PhD in Biostatistics from 2015.
+
+- Pragmatic user of both Bayesian and classical statistical methods.
+
+
+
+---
+
+
+# Plan for the Day
+
+| Time | What |
+| --- | --- |
+| 10:00 - 11:30 | Part I - Introduction to Bayesian Statistics |
+| 11:30 - 12:30 | Lunch |
+| 12:30 - 14:00 | Part II - Bayesian Workflow for Data Analysis |
+| 14:15 - 15:15 | Part III - Bayesian Analysis with R |
+| 15:30 - 17:00 | Exercises with "brms" in R |
+
+
+
+- Please remember, comments and questions are **always** welcome!
+
+- Presentations and other course material available at https://github.com/osorensen/BayesCourseEPINOR2021
+
+
+---
+
+# Setup
+
+For the R code in the presentations to work, we must run the following lines:
+
+
+```r
+library(tidyverse)
+theme_set(theme_classic())
+```
+
+
+.footnote[Wickham et al., (2019). Welcome to the Tidyverse. Journal of Open Source Software, 4(43), 1686, https://doi.org/10.21105/joss.01686]
+
+
+---
+
+class: inverse, middle, center
+
+# Part I - Introduction to Bayesian Statistics
+
+---
+
+
+# Outline for Part I
+
+- A brief history
+
+- Two ways of quantifying evidence - Bayesianism vs frequentism
+
+- Short break (5 min)
+
+- Priors and posteriors - a complete example with Bayesian linear regression
+
+
+---
+
+# Thomas Bayes (1701 - 1761)
+
+&lt;center&gt;
+&lt;img src="figures/Thomas_Bayes.gif"&gt;
+&lt;/center&gt;
+
+---
+class: inverse, middle, center
+
+&lt;img src="figures/Bayes_Essay.jpg"&gt;
+
+---
+
+# Bayes' theorem
+
+&gt; If there be two subsequent events, the probability of the second b/N and the probability of both together P/N, and it being first discovered that the second event has also happened, from hence I guess that the first event has also happened, the probability I am right is P/b.
+
+With symbols
+
+`$$P(A|B) = \frac{P(A \cap B)} {P(B)}$$`
+- `\(P(B)\)`: probability that the second event happened.
+- `\(P(A \cap B)\)`: probability that both events happened.
+- `\(P(A|B)\)`: probability that the first event happened, given that the second has happened.
+
+
+.footnote[Stigler, S.M. (1982), Thomas Bayes's Bayesian Inference. Journal of the Royal Statistical Society: Series A (General), 145: 250-258. https://doi.org/10.2307/2981538.]
+
+
+---
+
+# Bayes' theorem
+
+Considering Bayes' theorem again
+
+`$$P(A|B) = \frac{P(A \cap B)} {P(B)}$$`
+We know that `\(P(A \cap B) = P(B \cap A)\)`, since "A and B happened" is the same as "B and A happened". 
+--
+Hence, we also have
+
+`$$P(B|A) = \frac{P(B \cap A)}{P(A)} = \frac{P(A \cap B)}{P(A)}$$`
+--
+By some replacement, it follows that
+
+`$$P(A|B) = \frac{P(B|A)P(A)}{P(B)}$$`
+
+---
+
+# An application of Bayes' theorem
+
+&lt;center&gt;
+&lt;img src="figures/Rapid_Test.jpg", width=300&gt;
+&lt;/center&gt;
+
+
+
+---
+
+# An application of Bayes' theorem
+
+For a random person taken from the population, what is the probability of disease (event `\(A\)`) given positive test (event `\(B\)`)?
+--
+
+- Sensitivity: `\(P(B|A)\)`, (positive test given sick). 
+
+- Base rate: `\(P(A)\)` (sick). 
+
+- Positive test `\(P(B)\)`: 
+
+--
+
+  - Hard enough to deserve it's own slide.
+  
+  
+---
+  
+# Positive test
+
+- Total probability equals probability given sick plus probability given not sick. `\(\bar{A}\)` bar means "not A": 
+  
+`$$P(B) = P(B|\bar{A}) + P(B|A)$$`
+--
+
+- If you are not sick, you can either get a positive test `\(B\)` or a negative test `\(\bar{B}\)`, so
+
+`$$P(B|\bar{A}) + P(\bar{B}|\bar{A}) = 1$$`
+`$$P(B|\bar{A}) = 1- P(\bar{B}|\bar{A})$$`
+  
+--
+  
+- We thus get 
+
+`$$P(B) = \underbrace{\{1 - P(\bar{B}|\bar{A})\}}_{P(B|\bar{A})} + P(B|A)$$`
+  
+  
+---
+
+# An application of Bayes' theorem
+
+
+We get the probability of being sick given a positive test:
+
+`$$P(A|B) = \frac{P(B|A)P(A)}{P(B)} = \frac{P(B|A)P(A)}{1-P(\bar{B}|\bar{A}) + P(B|A)}$$`
+
+--
+
+Why useful?
+
+$$\text{unknown thing} = \text{formula with known things} $$
+
+
+
+---
+
+class: inverse, middle, center 
+
+# Bayesian vs Frequentist Statistics
+
+
+
+---
+
+# Example - ToothGrowth data
+
+- Consider a simple dataset, `ToothGrowth`, which comes with `R`.
+
+
+```r
+data("ToothGrowth")
+head(ToothGrowth)
+```
+
+```
+##    len supp dose
+## 1  4.2   VC  0.5
+## 2 11.5   VC  0.5
+## 3  7.3   VC  0.5
+## 4  5.8   VC  0.5
+## 5  6.4   VC  0.5
+## 6 10.0   VC  0.5
+```
+
+- `len` is length of tooth in guinea pigs.
+
+- `dose` is daily dose of vitamin C (mg/day)
+
+
+---
+
+# Visualization
+
+
+```r
+ggplot(ToothGrowth, aes(x = dose, y = len)) + 
+  geom_point()
+```
+
+&lt;img src="part-i-introduction_files/figure-html/unnamed-chunk-4-1.svg" style="display: block; margin: auto;" /&gt;
+
+???
+There seems to be a positive relationship, but how do we quantify our uncertainty?
+
+---
+
+# Linear Regression
+
+Linear regression estimates effect of dose on length.
+
+
+```r
+linreg &lt;- lm(len ~ dose, data = ToothGrowth)
+```
+
+
+
+```r
+library(broom)
+tidy(linreg)
+```
+
+```
+## # A tibble: 2 × 5
+##   term        estimate std.error statistic  p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)     7.42     1.26       5.89 2.06e- 7
+## 2 dose            9.76     0.953     10.3  1.23e-14
+```
+
+.footnote[David Robinson, Alex Hayes and Simon Couch (2021). broom: Convert Statistical Objects into Tidy Tibbles. R package version 0.7.9. https://CRAN.R-project.org/package=broom]
+
+---
+
+# Interpretation of p-values
+
+How do we interpret the p-value `\(1.23 \times 10^{-14}\)` for the estimated effect `\(\hat{\beta}=9.76\)`?
+
+--
+
+We have two hypotheses:
+
+- H0: No effect of vitamin C on tooth growth, `\(\beta=0\)`.
+
+- H1: Effect of vitamin C on tooth growth, `\(\beta \neq 0\)`.
+
+--
+
+And we can say:
+
+- If H0 is true and we take very many random datasets from the population, the magnitude `\(|\hat{\beta}|\)` would exceed 9.76 about `\(1.23 \times 10^{-14}\)` (0.00000000000123 %) of the times.
+
+Hence, under H0 the expected **frequency** of seeing a deviation this big is `\(1.23 \times 10^{-14}\)`.
+
+
+---
+
+# Some Points for Discussion
+
+- Is it ever possible that the null hypothesis is literally true? 
+
+  - Think of linear regression `\(y = \beta_{0} + \beta x + \epsilon\)` as an example, where `\(x\)` is some exposure and `\(y\)` is some outcome.
+
+--
+
+- What happens to p-values as we increase the sample size?
+
+---
+
+# Confidence intervals
+
+
+```r
+confint(linreg)
+```
+
+```
+##                2.5 %    97.5 %
+## (Intercept) 4.900171  9.944829
+## dose        7.856870 11.670273
+```
+
+
+- A 95% confidence interval is a thing which - when we repeatedly take random samples from the population - will contain the true value about 95% of the times.
+
+
+---
+
+# Bayesian linear regression
+
+We have a linear model for the `ToothGrowth` data:
+
+`$$y = \beta_{0} + \beta x + \epsilon$$`
+
+`\(y\)` is the length and `\(x\)` is the dose.
+
+---
+
+# Bayesian linear regression
+
+Can we use Bayes' theorem to say something about `\(\beta\)`?
+
+`$$\underbrace{p(\beta | \text{data})}_{\color{red}{\text{want to know}}} = \underbrace{\frac{p(\beta) p(\text{data}|\beta)}{ p(\text{data})}}_{\color{red}{\text{know?}}}$$`
+
+"data" is just a shorthand for "observed lengths at given doses".
+
+
+--
+
+1. Our prior knowledge: `\(p(\beta)\)`
+
+2. How likely it is to see the data we observed, for any given value of `\(\beta\)`: `\(p(\text{data}|\beta)\)`
+
+3. Normalizing constant: `\(p(\text{data})\)`.
+
+
+
+
+
+---
+
+class: inverse, middle, center
+
+# Piece by piece
+
+---
+
+# Piece 1 - The Prior
+
+- Quantifies our prior knowledge about the effect under study. 
+
+- Should be defined **before** looking at the data, just like tests in a frequentist analysis should predefined to avoid p-hacking.
+
+  - Which of course often is impossible in practice, but still good to keep in mind.
+
+
+---
+
+# Piece 1 - The Prior
+
+Assume we consider the biological nature of the problem, and find that `\(\beta\)`-values below -60 or above 60 are extremely unlikely. We also do not have any prior knowledge about the direction of the effect.
+
+--
+
+A convenient choice may then be a normal distribution with mean 0 and standard deviation `\(\sigma = 30\)`. Then `\(p(|\beta| &gt; 60) = 0.05\)`.
+
+&lt;img src="part-i-introduction_files/figure-html/unnamed-chunk-8-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# Piece 1 - The Prior
+
+In the words of Greenland (2006), when the only parameter of interest is a  risk ratio
+
+&gt; ... my 95% prior limits are a pair of numbers `\(RR_{lower}\)` and `\(RR_{upper}\)` such that I would give `\(95 : 5 =  19:1\)` odds that the true risk ratio is between these numbers, i.e. `\(P(RR_{lower} \leq RR \leq RR_{upper}) = 0.95\)` if I disregarded the analysis data.
+
+
+.footnote[Greenland, Sander. “Bayesian Perspectives for Epidemiological Research: I. Foundations and Basic Methods.” International Journal of Epidemiology 35, no. 3 (June 1, 2006): 765–75. https://doi.org/10.1093/ije/dyi312.]
+
+---
+
+# Piece 1 - The Prior
+
+Following Greenland, our normal prior for `\(\beta\)` implies that we would give 19:1 odds that the true slope is between -60 and 60.
+
+&lt;img src="part-i-introduction_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Noninformative prior
+
+Sometimes we have no idea, or we want to be "objective". Can use a uniform prior. Every possible value of `\(\beta\)` has a very very slight positive probability.
+
+&lt;img src="part-i-introduction_files/figure-html/unnamed-chunk-10-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Piece 2 - The Likelihood
+
+
+.pull-left[
+
+`\(p(\text{data} | \beta)\)` is the likelihood. For linear regression it is related to the residual sum of squares
+
+`$$RSS(\beta) = \sum_{i=1}^{n} \{y_{i} - (\beta_{0} + \beta x_{i})\}^2$$` 
+
+- What is the red dot? Is it related to frequentist linear regression?
+
+
+]
+.pull-right[
+
+
+&lt;img src="part-i-introduction_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+]
+
+
+
+
+
+
+---
+
+layout: false
+
+# Piece 3 - Normalizing Constant
+
+The final piece is the normalizing constant, `\(p(\text{data})\)`:
+
+`$$p(\beta | \text{data}) = \frac{p(\beta) p(\text{data}|\beta)}{ p(\text{data})}$$`
+
+Luckily, it does not contain `\(\beta\)`, so it's value does not affect our estimate of `\(\beta\)`. We write
+
+`$$p(\beta | \text{data}) \propto p(\beta) p(\text{data}|\beta)$$`
+and let the software deal with it.
+
+---
+
+# Piece 3 - Normalizing Constant
+
+The funny sign `\(\propto\)` means *is proportional to*, and the lack of a normalizing constant means that we can get *unnormalized* probabilities:
+
+
+| beta| Probability|
+|----:|-----------:|
+|    1|         4.5|
+|    2|         9.0|
+|    3|         7.0|
+
+
+--
+
+Normalization is straightforward in this case. We must divide each number by 4.5+9+7=20.5:
+
+
+| beta| Probability| Normalized prob.|
+|----:|-----------:|----------------:|
+|    1|         4.5|             0.22|
+|    2|         9.0|             0.44|
+|    3|         7.0|             0.34|
+
+
+---
+
+# Example - Bayesian version
+
+- Back to our linear regression. We have described the likelihood `\(p(\text{data}|\beta),\)` priors `\(p(\beta),\)` and the normalizing constant `\(p(\text{data})\)`. 
+
+- Estimates and confidence intervals look similar:
+
+&lt;img src="figures/linear_model_comparison.png"&gt;
+
+
+---
+
+# Posterior Distribution
+
+- However, Bayesian models let us do much more afterwards, like plotting `\(p(\beta | \text{data})\)`
+
+&lt;center&gt;
+&lt;img src="figures/linear_model_posterior.png", width=400&gt;
+&lt;/center&gt;
+
+---
+
+# Posterior Distribution
+
+- Or asking: What is the probability that the true value of `\(\beta\)` is larger than 10?
+
+
+&lt;center&gt;
+&lt;img src="figures/linear_model_posterior_gt10.png", width=400&gt;
+&lt;/center&gt;
+
+`$$p(\beta &gt; 10| \text{data}) = 0.4$$`
+
+---
+
+# Posterior Distribution
+
+Again back to Greenland
+
+&gt; The 50th percentile (median) of my posterior (...) is a number `\(RR_{median}\)` for which `\(P(RR \geq RR_{median} | data) =P(RR \leq RR_{median} | data)\)`, where (...) this bet is formulated in light of the analysis data. 
+
+&gt; Similarly, my 95% posterior limits are a pair of numbers `\(RR_{lower}\)` and `\(RR_{upper}\)` such that after analysing the data I would give `\(95:5=19:1\)` odds that the true relative risk is between these numbers, i.e. `\(P(RR_{lower} \leq RR \leq RR_{upper} | data) = 0.95\)`.
+
+This is the typical Bayesian interpretation of probability. Long term frequency under the null hypothesis is not mentioned.
+
+---
+
+# Posterior Confidence Interval
+
+The 95 % posterior interval for `\(\beta\)`, `\([7.8, 11.7]\)`, are such that after analyzing the data, we would give `\(19:1\)` odds that the true effect is between these two numbers.
+
+&lt;center&gt;
+&lt;img src="figures/linear_model_posterior_CI.png", width=400&gt;
+&lt;/center&gt;
+
+
+
+---
+layout: true
+
+# What's the effect of adding data?
+
+---
+
+&lt;center&gt;
+&lt;img src="figures/linreg_increment_1.png", width=400&gt;
+&lt;/center&gt;
+
+---
+
+&lt;center&gt;
+&lt;img src="figures/linreg_increment_2.png", width=400&gt;
+&lt;/center&gt;
+
+---
+
+&lt;center&gt;
+&lt;img src="figures/linreg_increment_3.png", width=400&gt;
+&lt;/center&gt;
+
+---
+
+&lt;center&gt;
+&lt;img src="figures/linreg_increment_4.png", width=400&gt;
+&lt;/center&gt;
+
+---
+
+&lt;center&gt;
+&lt;img src="figures/linreg_increment_5.png", width=400&gt;
+&lt;/center&gt;
+
+
+---
+layout: false
+class: inverse, middle, center
+
+# Summary of Bayesian vs Frequentist Statistics
+
+
+---
+
+# Bayesian vs Frequentist Statistics
+
+- Frequentist
+
+  - p-values interpreted in light of "how often would this happen if H0 was true and we sampled data again and again"?
+  
+  - Similarly for confidence intervals
+  
+- Bayesian
+
+  - Posterior distribution quantifies our degree of belief after seeing the data. Should agree with frequentist values if we sample data again and again.
+  
+  - Requires specifying the prior distribution, and works less out-of-the-box.
+  
+
+
+
+---
+
+class: center, middle
+
+
+# Thanks!
+
+Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
+
+The chakra comes from [remark.js](https://remarkjs.com), [**knitr**](https://yihui.org/knitr/), and [R Markdown](https://rmarkdown.rstudio.com).
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

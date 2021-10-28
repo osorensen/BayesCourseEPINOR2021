@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>EPINOR Annual Meeting 2021</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Øystein Sørensen" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# EPINOR Annual Meeting 2021
+## A Gentle Introduction to Bayesian Statistics
+### Øystein Sørensen
+### Department of Psychology, University of Oslo
+### 2021/11/02
+
+---
+
+
+
+
+
+
+
+---
+
+class: inverse, middle, center
+
+# Part II - Bayesian Workflow for Data Analysis
+
+
+
+---
+
+# Bayesian Workflow?
+
+Gelman et al. (2021) write
+
+&gt; Using Bayesian inference to solve real-world problems requires not only statistical skills, subject matter knowledge, and programming, but also awareness of the decisions made in the process of data analysis. All of these aspects can be understood as part of a tangled workflow of applied Bayesian statistics.
+
+.footnote[Gelman, A., Vehtari, A., Simpson, D., Margossian, C. C., Carpenter, B., Yao, Y., Kennedy, L., Gabry, J., Bürkner, P.-C., &amp; Modrák, M. (2020). Bayesian Workflow. ArXiv:2011.01808 [Stat]. http://arxiv.org/abs/2011.01808]
+
+
+---
+
+# Phases of a Statistical Workflow
+
+(a) Exploratory data analysis to aid in choosing initial model.
+
+(b) Quantify prior knowledge.
+
+(c) Check that the computations work correctly.
+
+(d) Check that the model fits the data well.
+
+(e) Compare to other more or less complicated models.
+
+.footnote[Gabry, J., Simpson, D., Vehtari, A., Betancourt, M., &amp; Gelman, A. (2019). Visualization in Bayesian workflow. Journal of the Royal Statistical Society: Series A (Statistics in Society), 182(2), 389–402. https://doi.org/10.1111/rssa.12378]
+
+
+---
+
+# Birth Weight Data
+
+Data from Low Birth Weight Study, used by Hosmer and Lemeshow (2000).
+
+
+
+```r
+dat &lt;- readRDS("data/bwt.rds")
+head(dat)
+```
+
+```
+## # A tibble: 6 × 5
+##     Low   Age   LWT Smoker Hypertension
+##   &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;lgl&gt;  &lt;lgl&gt;       
+## 1     0    19  82.6 FALSE  FALSE       
+## 2     0    33  70.3 FALSE  FALSE       
+## 3     0    20  47.6 TRUE   FALSE       
+## 4     0    21  49.0 TRUE   FALSE       
+## 5     0    18  48.5 TRUE   FALSE       
+## 6     0    21  56.2 FALSE  FALSE
+```
+
+
+
+.footnote[David W. Hosmer and Stanley Lemeshow (2000). Applied Logistic Regression, Second Edition. John Wiley &amp; Sons, Inc. ISBN:9780471356325. https://doi.org/10.1002/0471722146]
+
+
+---
+
+# Birth Weight Data
+
+
+```r
+head(dat)
+```
+
+```
+## # A tibble: 6 × 5
+##     Low   Age   LWT Smoker Hypertension
+##   &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;lgl&gt;  &lt;lgl&gt;       
+## 1     0    19  82.6 FALSE  FALSE       
+## 2     0    33  70.3 FALSE  FALSE       
+## 3     0    20  47.6 TRUE   FALSE       
+## 4     0    21  49.0 TRUE   FALSE       
+## 5     0    18  48.5 TRUE   FALSE       
+## 6     0    21  56.2 FALSE  FALSE
+```
+
+- **Low**: Did the child have birth weight below 2500 grams?
+- **Age**: Age of mother.
+- **LWT**: Weight of mother at last menstrual period (kg).
+- **Smoker**: Does mother smoke?
+- **Hypertension**: Does mother have high blood pressure?
+
+---
+
+# Birth Weight Data
+
+Research question:
+
+- Is weight of mother at last menstrual period related to whether the child has birth weight below 2500 grams?
+
+Possible confounding factors are age, smoking status, and hypertension.
+
+---
+
+# (a) Exploratory data analysis
+
+Women with lower weight have higher probabilty of low birthweight.
+
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-6-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# (a) Exploratory data analysis
+
+.pull-left[
+Weaker relationship when stratifying by smoking status?
+
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-7-1.svg" style="display: block; margin: auto;" /&gt;
+]
+--
+.pull-right[
+
+Reasonable numbers in each group:
+
+
+```r
+dat %&gt;% 
+  group_by(Low, Smoker) %&gt;% 
+  count()
+```
+
+```
+## # A tibble: 4 × 3
+## # Groups:   Low, Smoker [4]
+##     Low Smoker     n
+##   &lt;int&gt; &lt;lgl&gt;  &lt;int&gt;
+## 1     0 FALSE     86
+## 2     0 TRUE      44
+## 3     1 FALSE     29
+## 4     1 TRUE      30
+```
+
+]
+
+---
+
+# (a) Exploratory data analysis
+
+
+.pull-left[
+What about hypertension?
+
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
+]
+--
+.pull-right[
+
+Small group sizes, so we should take the plots with a grain of salt.
+
+
+```r
+dat %&gt;% 
+  group_by(Low, Hypertension) %&gt;% 
+  count()
+```
+
+```
+## # A tibble: 4 × 3
+## # Groups:   Low, Hypertension [4]
+##     Low Hypertension     n
+##   &lt;int&gt; &lt;lgl&gt;        &lt;int&gt;
+## 1     0 FALSE          125
+## 2     0 TRUE             5
+## 3     1 FALSE           52
+## 4     1 TRUE             7
+```
+
+]
+
+---
+
+# (a) Exploratory data analysis
+
+Hard to claim that there is a relationship between age and low birthweight:
+
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# (a) Exploratory data analysis
+
+Logistic regression model seems appropriate.
+
+- Initial model of the form 
+
+`Low ~ LWT`
+
+- We believe that smoking status might be an important covariate to include.
+
+- Will also include age, so the most complex model becomes:
+
+`Low ~ LWT + Age + Smoker`.
+
+
+---
+
+# (a) Exploratory data analysis
+
+The plots shown above may not have given too much information on how to build the model, but there are cases where it could have been crucial. 
+
+These simulated plots show such a situation:
+
+
+
+.pull-left[
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
+]
+--
+.pull-right[
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
+
+]
+
+The plots definitely suggest that we should include hypertension in the model.
+
+
+---
+
+# (b) Quantify prior knowledge
+
+Prior predictive simulations:
+
+- Giving values to the parameters of the prior distribution is hard. We can circumvent the problem by rather looking at what type of data are implied by the prior.
+
+
+---
+
+# (b) Quantify prior knowledge
+
+- Logistic regression model
+
+`$$P(Low) = \text{logit}\left(\beta_{0} + \beta_{LWT} LWT\right)$$`
+
+- Consider two mothers, whose weights are `\(LWT_{1}\)` and `\(LWT_{2}\)`. The odds ratio of low birthweight between mother 1 and mother 2 is
+
+`$$\exp\left\{(LWT_{1}-LWT_{2}) \beta_{LWT}\right\} = \exp\left\{\Delta_{W} \beta_{LWT}\right\}$$`
+- We can use this to find a reasonable prior distribution for `\(\beta_{LWT}\)`.
+
+
+---
+
+# (b) Quantify prior knowledge
+
+An example to make what's coming seem more sensible. Assuming `\(\beta_{LWT}=-0.10\)`, we can make the following plot to interpret the effect:
+
+
+
+.pull-left[
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-16-1.svg" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+
+---
+
+# (b) Quantify prior knowledge
+
+Let's start by assuming a very wide prior distribution for `\(\beta_{LWT}\)`&lt;sup&gt;1&lt;/sup&gt;. Normal with mean 0 and standard deviation 100.
+
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-18-1.svg" style="display: block; margin: auto;" /&gt;
+
+We would give 19:1 odds that the true `\(\beta_{LWT}\)` is between -200 and +200. And 1:1 odds that `\(\beta_{LWT}\)` is below or above 0.
+
+.footnote[&lt;sup&gt;1&lt;/sup&gt;This is a very common thing to do.]
+
+---
+
+# (b) Quantify prior knowledge
+
+Continuing with our wide prior distribution, here is what it means in terms of odds ratios:
+
+
+
+.pull-left[
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-20-1.svg" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-21-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+We would probably give more than 19:1 odds that the odds ratio is lower than this!
+
+
+---
+
+# (b) Quantify prior knowledge
+
+We can try to be a bit more informative. Let the prior be normal with mean 0 and standard deviation 1.
+
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-22-1.svg" style="display: block; margin: auto;" /&gt;
+
+We would give 19:1 odds that the true `\(\beta_{LWT}\)` is between -2 and +2. And 1:1 odds that `\(\beta_{LWT}\)` is below or above 0.
+
+
+---
+
+# (b) Quantify prior knowledge
+
+It goes in the sensible direction, but the extreme ends are still crazy.
+
+
+
+.pull-left[
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-24-1.svg" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-25-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+We would probably give more than 19:1 odds that the odds ratio is lower than this!
+
+---
+
+# (b) Quantify prior knowledge
+
+We can try to be even a bit more informative. Let the prior be normal with mean 0 and standard deviation 0.2.
+
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-26-1.svg" style="display: block; margin: auto;" /&gt;
+
+We would give 19:1 odds that the true `\(\beta_{LWT}\)` is between -0.4 and +0.4. And 1:1 odds that `\(\beta_{LWT}\)` is below or above 0.
+
+
+---
+
+# (b) Quantify prior knowledge
+
+We still allow quite large effects within our 95 % prior limits, but the prior bets make much more sense now than for the initial prior that we tried.
+
+
+
+.pull-left[
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-28-1.svg" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-29-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+Seems kind of reasonable to give 19:1 odds that the odds ratio is somewhere between the red and the blue curves?
+
+---
+
+class: inverse, middle, center 
+
+# Now to step (c) of the Bayesian workflow
+
+This requires some unavoidable math, but I'll try to be gentle
+
+---
+
+# (c) Check that the computations work correctly
+
+Why need we care about computations??
+
+
+---
+
+# (c) Check that the computations work correctly
+
+Consider the frequentist logistic regression model:
+
+
+```r
+mod &lt;- glm(Low ~ LWT, data = dat, family = binomial())
+```
+
+
+Lots of things going on in the background which we don't need to care about:
+
+- Iteratively reweighted least squares
+- C and Fortran libraries for solving matrix equations
+- Derivatives of first and second order
+- etc etc etc
+
+Very mature technology. Fisher had to care about these things. We don't.
+
+
+---
+
+# (c) Check that the computations work correctly
+
+Estimation of Bayesian models requires more attention. We care about the posterior for `\(\beta_{LWT}\)`, 
+
+`$$p(\beta_{LWT} | \text{data}) = \frac{p(\beta_{LWT}) p(\text{data} | \beta_{LWT})}{p(\text{data})}$$`
+
+If we have the prior `\(p(\beta_{LWT})\)` and the likelihood `\(p(\text{data} | \beta_{LWT})\)` we can obtain samples from the posterior distribution using something called Monte Carlo sampling.
+
+
+---
+
+class: inverse
+
+# Monte Carlo Sampling?
+
+&lt;center&gt;
+&lt;img src="figures/metropolis-hastings.jpg"&gt;
+&lt;/center&gt;
+
+
+---
+
+# Monte Carlo Sampling?
+
+.pull-left[
+- Monte Carlo sampling, typically Metropolis-Hastings algorithms, give us a large sample from the posterior distribution.
+
+- From here we need to derive things like posterior mean, standard deviation, confidence intervals, etc.
+
+- R packages can solve a lot, but some knowledge of the algorithms is need.
+]
+.pull-right[
+&lt;center&gt;
+&lt;img src="figures/posterior_example.png"&gt;
+&lt;/center&gt;
+]
+
+---
+
+# (c) Check traceplot
+
+It should look random, like this.
+
+&lt;center&gt;
+&lt;img src="figures/trace_plot_example.png" height="300"&gt;
+&lt;/center&gt;
+
+
+---
+
+# (c) Check traceplot
+
+And rather not like this. Algorithm gets stuck at each random number.
+
+&lt;center&gt;
+&lt;img src="figures/bad_trace_plot_example.png" height="300"&gt;
+&lt;/center&gt;
+
+
+---
+
+# (c) Check that the computations work correctly
+
+Other things you might have to consider:
+
+- R-hat
+
+- Autocorrelation
+
+- Effective sample size
+
+- Divergent transitions
+
+
+---
+
+# (d) Check that the model fits the data well
+
+Prior predictive checks:
+
+- If the model fits the data well, simulating new observations from the model should give values close to the real data.
+
+---
+
+# Posterior predictive check 1
+
+When re-generating 100 random datasets with same weight of mother, using the estimated posterior distribution of `\(\beta_{LWT}\)`, are the proportions of low birthweight children comparable?
+
+&lt;center&gt;
+&lt;img src="figures/pp_bar_example.png" height="300"&gt;
+&lt;/center&gt;
+
+---
+
+# Posterior predictive check 2
+
+Logistic regression predicts the probability. Is the a relationship between the predicted probability and the error rate?
+
+&lt;center&gt;
+&lt;img src="figures/pp_error_binned_example.png" height="400"&gt;
+&lt;/center&gt;
+
+
+---
+
+class: inverse, middle, center
+
+# Predictive checks passed!
+
+Next a little reminder
+
+---
+
+# Phases of a Statistical Workflow
+
+(a) Exploratory data analysis to aid in choosing initial model.
+
+(b) Quantify prior knowledge.
+
+(c) Check that the computations work correctly.
+
+(d) Check that the model fits the data well.
+
+**(e) Compare to other more or less complicated models.**
+
+.footnote[Gabry, J., Simpson, D., Vehtari, A., Betancourt, M., &amp; Gelman, A. (2019). Visualization in Bayesian workflow. Journal of the Royal Statistical Society: Series A (Statistics in Society), 182(2), 389–402. https://doi.org/10.1111/rssa.12378]
+
+
+---
+
+# (e) Compare to other more or less complicated models
+
+Let's add smoking status:
+
+`$$P(Low) = \text{logit}\left(\beta_{0} + \beta_{LWT} \text{LWT} + \beta_{S} \text{Smoker}\right)$$`
+
+You'll work through the prior for `\(\beta_{S}\)` later.
+
+---
+
+# (e) Compare to other more or less complicated models
+
+A common way of comparing models is to assess how well they predict new data. Cross-validation and Akaike information criterion are ways of assessing this.
+
+Bayesian twists here as well:
+
+- Widely Applicable Information Criterion (WAIC)
+
+- Pareto smoothed importance sampling leave-one-out cross-validation (PSIS-LOO CV)&lt;sup&gt;1&lt;/sup&gt;
+
+
+.footnote[&lt;sup&gt;1&lt;/sup&gt; Try to say that loud.]
+
+---
+
+# WAIC
+
+```
+## Output of model 'LWT':
+## 
+## Computed from 4000 by 189 log-likelihood matrix
+## 
+##           Estimate   SE
+## elpd_waic   -116.5  5.6
+## p_waic         2.2  0.3
+## waic         233.0 11.3
+## 
+## Output of model 'LWT+Smoker':
+## 
+## Computed from 4000 by 189 log-likelihood matrix
+## 
+##           Estimate   SE
+## elpd_waic   -115.3  5.8
+## p_waic         3.1  0.3
+## waic         230.6 11.7
+## 
+## Model comparisons:
+##            elpd_diff se_diff
+## LWT+Smoker  0.0       0.0   
+## LWT        -1.2       2.2
+```
+
+---
+
+# LOO
+
+
+```
+##      elpd_diff se_diff
+## mod2  0.0       0.0   
+## mod  -1.2       2.2 
+```
+
+---
+
+class: center, middle
+
+# Thanks!
+
+Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
+
+The chakra comes from [remark.js](https://remarkjs.com), [**knitr**](https://yihui.org/knitr/), and [R Markdown](https://rmarkdown.rstudio.com).
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
