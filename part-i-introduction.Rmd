@@ -15,6 +15,7 @@ output:
 
 ```{r, echo=FALSE}
 knitr::opts_chunk$set(fig.align = "center")
+knitr::opts_chunk$set(cache = TRUE)
 ```
 
 

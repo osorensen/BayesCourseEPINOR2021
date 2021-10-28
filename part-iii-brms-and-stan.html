@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>EPINOR Annual Meeting 2021</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Øystein Sørensen" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# EPINOR Annual Meeting 2021
+## Part III - Bayesian Analysis with R
+### Øystein Sørensen
+### University of Oslo
+### 2021/11/02
+
+---
+
+
+
+
+
+# Outline for Part III
+
+- An overview of tools for Bayesian analysis in R
+
+- Stan, brms
+
+- 15 minute break
+
+- Hands-on exercises
+
+---
+
+# Fitting Bayesian Models
+
+- Computation for Bayesian models requires more expertise than fitting frequentist models.
+
+- [BUGS - Bayesian Inference Using Gibbs Sampling](https://www.mrc-bsu.cam.ac.uk/software/bugs/)
+  
+  - Early software, which you may encounter in older textbooks. Can be used, but no longer actively developed.
+  
+- [JAGS - Just Another Gibbs Sampler](https://mcmc-jags.sourceforge.io/)
+
+  - Further development of BUGS, but no new releases last four years.
+  
+- [Stan](https://mc-stan.org/)
+
+  - State-of-the-art tool for Bayesian computation.
+  
+  - Very active community.
+
+
+---
+
+# Fitting Bayesian Models
+
+- Stan is a programming language of its own, definitely increasing the barrier for easy learning.
+
+- Can use R packages that yield familiar syntax, translating R code into Stan code:
+
+  - [rethinking](https://github.com/rmcelreath/rethinking)
+  
+  - [rstanarm](https://mc-stan.org/rstanarm/)
+  
+  - [brms](https://paul-buerkner.github.io/brms/)
+  
+- [You can also use Stan from Stata!](https://github.com/stan-dev/statastan)
+
+
+---
+
+# brms
+
+
+```r
+library(brms)
+```
+
+```
+## Loading required package: Rcpp
+```
+
+```
+## Loading 'brms' package (version 2.16.1). Useful instructions
+## can be found by typing help('brms'). A more detailed introduction
+## to the package is available through vignette('brms_overview').
+```
+
+```
+## 
+## Attaching package: 'brms'
+```
+
+```
+## The following object is masked from 'package:stats':
+## 
+##     ar
+```
+
+
+---
+
+# Fitting a logistic regression model with brms
+
+
+```r
+dat &lt;- readRDS("data/bwt.rds")
+head(dat)
+```
+
+```
+## # A tibble: 6 × 5
+##     Low   Age   LWT Smoker Hypertension
+##   &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;lgl&gt;  &lt;lgl&gt;       
+## 1     0    19  82.6 FALSE  FALSE       
+## 2     0    33  70.3 FALSE  FALSE       
+## 3     0    20  47.6 TRUE   FALSE       
+## 4     0    21  49.0 TRUE   FALSE       
+## 5     0    18  48.5 TRUE   FALSE       
+## 6     0    21  56.2 FALSE  FALSE
+```
+
+
+---
+
+# Fitting a logistic regression model with brms
+
+
+```r
+mod &lt;- brm(Low ~ LWT, data = dat, family = bernoulli())
+```
+
+
+
+---
+
+# Fitting a logistic regression model with brms
+
+Very similar to this:
+
+
+```r
+mod &lt;- glm(Low ~ LWT, data = dat, family = binomial())
+```
+
+
+---
+
+class: center, middle
+
+# Thanks!
+
+Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
+
+The chakra comes from [remark.js](https://remarkjs.com), [**knitr**](https://yihui.org/knitr/), and [R Markdown](https://rmarkdown.rstudio.com).
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

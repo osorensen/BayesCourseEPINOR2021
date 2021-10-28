@@ -13,16 +13,99 @@ output:
       countIncrementalSlides: false
 ---
 
+```{r, echo=FALSE}
+knitr::opts_chunk$set(fig.align = "center")
+knitr::opts_chunk$set(cache = TRUE)
+```
+
 
 # Outline for Part III
 
-- An overview of tools for Bayesian analysis
+- An overview of tools for Bayesian analysis in R
 
 - Stan, brms
 
 - 15 minute break
 
 - Hands-on exercises
+
+---
+
+# Fitting Bayesian Models
+
+- Computation for Bayesian models requires more expertise than fitting frequentist models.
+
+- [BUGS - Bayesian Inference Using Gibbs Sampling](https://www.mrc-bsu.cam.ac.uk/software/bugs/)
+  
+  - Early software, which you may encounter in older textbooks. Can be used, but no longer actively developed.
+  
+- [JAGS - Just Another Gibbs Sampler](https://mcmc-jags.sourceforge.io/)
+
+  - Further development of BUGS, but no new releases last four years.
+  
+- [Stan](https://mc-stan.org/)
+
+  - State-of-the-art tool for Bayesian computation.
+  
+  - Very active community.
+
+
+---
+
+# Fitting Bayesian Models
+
+- Stan is a programming language of its own, definitely increasing the barrier for easy learning.
+
+- Can use R packages that yield familiar syntax, translating R code into Stan code:
+
+  - [rethinking](https://github.com/rmcelreath/rethinking)
+  
+  - [rstanarm](https://mc-stan.org/rstanarm/)
+  
+  - [brms](https://paul-buerkner.github.io/brms/)
+  
+- [You can also use Stan from Stata!](https://github.com/stan-dev/statastan)
+
+
+---
+
+# brms
+
+```{r}
+library(brms)
+```
+
+
+---
+
+# Fitting a logistic regression model with brms
+
+```{r}
+dat <- readRDS("data/bwt.rds")
+head(dat)
+```
+
+
+---
+
+# Fitting a logistic regression model with brms
+
+```{r, eval=FALSE}
+mod <- brm(Low ~ LWT, data = dat, family = bernoulli())
+```
+
+
+
+---
+
+# Fitting a logistic regression model with brms
+
+Very similar to this:
+
+```{r, eval=FALSE}
+mod <- glm(Low ~ LWT, data = dat, family = binomial())
+```
+
 
 ---
 
