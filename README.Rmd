@@ -34,7 +34,7 @@ sessionInfo()
 
 If the version is too old, [go here to download the latest version](https://cloud.r-project.org/).
 
-Next, we need to install 'brms'. The instructions below are hopefully sufficient, but if you have trouble, please write me an e-mail or (even better) open an [Issue in this repository](https://github.com/osorensen/BayesCourseEPINOR2021/issues), since then everyone else will be able to see.
+Next, we need to install 'brms'. The instructions below are hopefully sufficient, but if you have trouble, please [drop me an e-mail](mailto:oyss@uio.no).
 
 ## Mac OS
 

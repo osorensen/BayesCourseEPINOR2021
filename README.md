@@ -6,7 +6,8 @@ Gentle Introduction to Bayesian Statistics” at the [Epinor Annual
 Meeting
 2021](https://en.uit.no/forskning/forskningsgrupper/nyheter/artikkel?p_document_id=476300&sub_id=744901).
 
-The plan for the day is as follows:
+The tentative plan for the day is as follows. Links to the course
+material will be added once it’s ready.
 
 | Time          | What                                          |
 |---------------|-----------------------------------------------|
@@ -62,10 +63,8 @@ If the version is too old, [go here to download the latest
 version](https://cloud.r-project.org/).
 
 Next, we need to install ‘brms’. The instructions below are hopefully
-sufficient, but if you have trouble, please write me an e-mail or (even
-better) open an [Issue in this
-repository](https://github.com/osorensen/BayesCourseEPINOR2021/issues),
-since then everyone else will be able to see.
+sufficient, but if you have trouble, please [drop me an
+e-mail](mailto:oyss@uio.no).
 
 ## Mac OS
 
