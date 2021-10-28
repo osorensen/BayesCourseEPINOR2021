@@ -13,6 +13,8 @@ output:
 
 This repository will contain course material for the one-day course "A Gentle Introduction to Bayesian Statistics" at the [Epinor Annual Meeting 2021](https://en.uit.no/forskning/forskningsgrupper/nyheter/artikkel?p_document_id=476300&sub_id=744901). 
 
+# Course Plan
+
 The tentative plan for the day is as follows. Links to the course material will be added once it's ready.
 
 | Time | What |
