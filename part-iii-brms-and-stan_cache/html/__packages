@@ -1,4 +1,6 @@
 base
+Rcpp
+brms
 tidyverse
 ggplot2
 tibble
@@ -12,5 +14,3 @@ glue
 broom
 patchwork
 latex2exp
-Rcpp
-brms

@@ -24,6 +24,9 @@ class: center, middle, inverse, title-slide
 
 
 
+
+
+
 # Outline for Part III
 
 - An overview of tools for Bayesian analysis in R
@@ -74,6 +77,20 @@ class: center, middle, inverse, title-slide
 
 ---
 
+# Stan?
+
+.pull-left[
+[Stanisław Ulam](https://en.wikipedia.org/wiki/Stanislaw_Ulam)
+
+&gt; a Polish scientist in the fields of mathematics and nuclear physics. He participated in the Manhattan Project, originated the Teller–Ulam design of thermonuclear weapons, discovered the concept of the cellular automaton, invented the Monte Carlo method of computation, and suggested nuclear pulse propulsion
+]
+.pull-right[
+&lt;img src="figures/Stanislaw_Ulam.jpg" height=400&gt;
+]
+
+
+---
+
 # brms
 
 
@@ -81,6 +98,11 @@ class: center, middle, inverse, title-slide
 library(brms)
 ```
 
+
+.footnote[
+Bürkner, Paul-Christian. “brms: An R Package for Bayesian Multilevel Models Using Stan.” Journal of Statistical Software 80, no. 1 (August 29, 2017): 1–28. https://doi.org/10.18637/jss.v080.i01.
+Bürkner, Paul-Christian. “Advanced Bayesian Multilevel Modeling with the R Package Brms.” The R Journal 10, no. 1 (2018): 395–411. https://doi.org/10.32614/RJ-2018-017.
+]
 
 ---
 
@@ -109,23 +131,850 @@ head(dat)
 
 # Fitting a logistic regression model with brms
 
-
 ```r
 mod &lt;- brm(Low ~ LWT, data = dat, family = bernoulli())
+## Compiling Stan program...
+## Start sampling
+## 
+## SAMPLING FOR MODEL 'd3c8392ac3fcb0c96e96bdaad5582435' NOW (CHAIN 1).
+## Chain 1: 
+## Chain 1: Gradient evaluation took 2.1e-05 seconds
+## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.21 seconds.
+## Chain 1: Adjust your expectations accordingly!
+## Chain 1: 
+## Chain 1: 
+## Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 1: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## ...
+## Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 4: 
+## Chain 4:  Elapsed Time: 0.058381 seconds (Warm-up)
+## Chain 4:                0.054892 seconds (Sampling)
+## Chain 4:                0.113273 seconds (Total)
+## Chain 4: 
 ```
-
 
 
 ---
 
 # Fitting a logistic regression model with brms
 
-Very similar to this:
 
 
 ```r
-mod &lt;- glm(Low ~ LWT, data = dat, family = binomial())
+mod &lt;- brm(Low ~ LWT, data = dat, family = bernoulli())
 ```
+
+```
+## Compiling Stan program...
+```
+
+```
+## Trying to compile a simple C file
+```
+
+```
+## Running /Library/Frameworks/R.framework/Resources/bin/R CMD SHLIB foo.c
+## clang -mmacosx-version-min=10.13 -I"/Library/Frameworks/R.framework/Resources/include" -DNDEBUG   -I"/Library/Frameworks/R.framework/Versions/4.1/Resources/library/Rcpp/include/"  -I"/Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include/"  -I"/Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include/unsupported"  -I"/Library/Frameworks/R.framework/Versions/4.1/Resources/library/BH/include" -I"/Library/Frameworks/R.framework/Versions/4.1/Resources/library/StanHeaders/include/src/"  -I"/Library/Frameworks/R.framework/Versions/4.1/Resources/library/StanHeaders/include/"  -I"/Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppParallel/include/"  -I"/Library/Frameworks/R.framework/Versions/4.1/Resources/library/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DBOOST_NO_AUTO_PTR  -include '/Library/Frameworks/R.framework/Versions/4.1/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include   -fPIC  -Wall -g -O2  -c foo.c -o foo.o
+## In file included from &lt;built-in&gt;:1:
+## In file included from /Library/Frameworks/R.framework/Versions/4.1/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:13:
+## In file included from /Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include/Eigen/Dense:1:
+## In file included from /Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include/Eigen/Core:88:
+## /Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include/Eigen/src/Core/util/Macros.h:628:1: error: unknown type name 'namespace'
+## namespace Eigen {
+## ^
+## /Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include/Eigen/src/Core/util/Macros.h:628:16: error: expected ';' after top level declarator
+## namespace Eigen {
+##                ^
+##                ;
+## In file included from &lt;built-in&gt;:1:
+## In file included from /Library/Frameworks/R.framework/Versions/4.1/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:13:
+## In file included from /Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include/Eigen/Dense:1:
+## /Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include/Eigen/Core:96:10: fatal error: 'complex' file not found
+## #include &lt;complex&gt;
+##          ^~~~~~~~~
+## 3 errors generated.
+## make: *** [foo.o] Error 1
+```
+
+```
+## Start sampling
+```
+
+```
+## 
+## SAMPLING FOR MODEL 'd3c8392ac3fcb0c96e96bdaad5582435' NOW (CHAIN 1).
+## Chain 1: 
+## Chain 1: Gradient evaluation took 2e-05 seconds
+## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.2 seconds.
+## Chain 1: Adjust your expectations accordingly!
+## Chain 1: 
+## Chain 1: 
+## Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 1: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 1: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 1: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 1: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 1: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 1: 
+## Chain 1:  Elapsed Time: 0.033499 seconds (Warm-up)
+## Chain 1:                0.027027 seconds (Sampling)
+## Chain 1:                0.060526 seconds (Total)
+## Chain 1: 
+## 
+## SAMPLING FOR MODEL 'd3c8392ac3fcb0c96e96bdaad5582435' NOW (CHAIN 2).
+## Chain 2: 
+## Chain 2: Gradient evaluation took 1e-05 seconds
+## Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.1 seconds.
+## Chain 2: Adjust your expectations accordingly!
+## Chain 2: 
+## Chain 2: 
+## Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 2: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 2: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 2: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 2: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 2: 
+## Chain 2:  Elapsed Time: 0.036603 seconds (Warm-up)
+## Chain 2:                0.027125 seconds (Sampling)
+## Chain 2:                0.063728 seconds (Total)
+## Chain 2: 
+## 
+## SAMPLING FOR MODEL 'd3c8392ac3fcb0c96e96bdaad5582435' NOW (CHAIN 3).
+## Chain 3: 
+## Chain 3: Gradient evaluation took 1e-05 seconds
+## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.1 seconds.
+## Chain 3: Adjust your expectations accordingly!
+## Chain 3: 
+## Chain 3: 
+## Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 3: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 3: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 3: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 3: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 3: 
+## Chain 3:  Elapsed Time: 0.032586 seconds (Warm-up)
+## Chain 3:                0.031093 seconds (Sampling)
+## Chain 3:                0.063679 seconds (Total)
+## Chain 3: 
+## 
+## SAMPLING FOR MODEL 'd3c8392ac3fcb0c96e96bdaad5582435' NOW (CHAIN 4).
+## Chain 4: 
+## Chain 4: Gradient evaluation took 1.3e-05 seconds
+## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.13 seconds.
+## Chain 4: Adjust your expectations accordingly!
+## Chain 4: 
+## Chain 4: 
+## Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 4: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 4: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 4: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 4: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 4: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 4: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 4: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 4: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 4: 
+## Chain 4:  Elapsed Time: 0.030931 seconds (Warm-up)
+## Chain 4:                0.030126 seconds (Sampling)
+## Chain 4:                0.061057 seconds (Total)
+## Chain 4:
+```
+
+is very similar to
+
+
+```r
+mod_glm &lt;- glm(Low ~ LWT, data = dat, family = binomial())
+```
+
+- `family = binomial()` would work with brms too, but is not the standard syntax.
+
+---
+
+# Model output
+
+
+```r
+summary(mod)
+```
+
+```
+##  Family: bernoulli 
+##   Links: mu = logit 
+## Formula: Low ~ LWT 
+##    Data: dat (Number of observations: 189) 
+##   Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+##          total post-warmup draws = 4000
+## 
+## Population-Level Effects: 
+##           Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+## Intercept     1.05      0.80    -0.48     2.65 1.00     3356     2897
+## LWT          -0.03      0.01    -0.06    -0.01 1.00     2997     2757
+## 
+## Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+## and Tail_ESS are effective sample size measures, and Rhat is the potential
+## scale reduction factor on split chains (at convergence, Rhat = 1).
+```
+
+---
+
+class: inverse, middle, center
+
+# Let's try to use the Bayesian workflow
+
+---
+
+# (a) Exploratory Data Analysis
+
+- Important, but not particularly related to brms. 
+
+---
+
+# (b) Prior Distribution
+
+In the previous lecture we decided on using a normal prior for `\(\beta_{LWT}\)` with mean 0 and standard deviation 0.4.
+
+We start by getting the default prior:
+
+
+```r
+prior &lt;- get_prior(Low ~ LWT, family = bernoulli(), 
+                   data = dat)
+print(prior, show_df = FALSE)
+```
+
+```
+## b ~ (flat)
+## b_LWT ~ (flat)
+## Intercept ~ student_t(3, 0, 2.5)
+```
+
+- "b" denotes all population-level parameters
+- "b_LWT" denotes the particular LWT parameter
+- "Intercept" is what it is.
+
+---
+
+# (b) Prior Distribution
+
+Update to get what we want:
+
+
+```r
+prior$prior[2] &lt;- "normal(0, 0.4)"
+```
+
+--
+
+Check that prior is updated:
+
+
+```r
+print(prior, show_df = FALSE)
+```
+
+```
+## b ~ (flat)
+## b_LWT ~ normal(0, 0.4)
+## Intercept ~ student_t(3, 0, 2.5)
+```
+
+---
+
+# (c) Check that the computations work correctly
+
+Then we have to fit the model first, with our preferred prior:
+
+
+```r
+mod &lt;- brm(Low ~ LWT, data = dat, family = bernoulli(),
+           prior = prior)
+```
+
+```
+## Compiling Stan program...
+```
+
+```
+## Trying to compile a simple C file
+```
+
+```
+## Running /Library/Frameworks/R.framework/Resources/bin/R CMD SHLIB foo.c
+## clang -mmacosx-version-min=10.13 -I"/Library/Frameworks/R.framework/Resources/include" -DNDEBUG   -I"/Library/Frameworks/R.framework/Versions/4.1/Resources/library/Rcpp/include/"  -I"/Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include/"  -I"/Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include/unsupported"  -I"/Library/Frameworks/R.framework/Versions/4.1/Resources/library/BH/include" -I"/Library/Frameworks/R.framework/Versions/4.1/Resources/library/StanHeaders/include/src/"  -I"/Library/Frameworks/R.framework/Versions/4.1/Resources/library/StanHeaders/include/"  -I"/Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppParallel/include/"  -I"/Library/Frameworks/R.framework/Versions/4.1/Resources/library/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DBOOST_NO_AUTO_PTR  -include '/Library/Frameworks/R.framework/Versions/4.1/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include   -fPIC  -Wall -g -O2  -c foo.c -o foo.o
+## In file included from &lt;built-in&gt;:1:
+## In file included from /Library/Frameworks/R.framework/Versions/4.1/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:13:
+## In file included from /Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include/Eigen/Dense:1:
+## In file included from /Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include/Eigen/Core:88:
+## /Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include/Eigen/src/Core/util/Macros.h:628:1: error: unknown type name 'namespace'
+## namespace Eigen {
+## ^
+## /Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include/Eigen/src/Core/util/Macros.h:628:16: error: expected ';' after top level declarator
+## namespace Eigen {
+##                ^
+##                ;
+## In file included from &lt;built-in&gt;:1:
+## In file included from /Library/Frameworks/R.framework/Versions/4.1/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:13:
+## In file included from /Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include/Eigen/Dense:1:
+## /Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include/Eigen/Core:96:10: fatal error: 'complex' file not found
+## #include &lt;complex&gt;
+##          ^~~~~~~~~
+## 3 errors generated.
+## make: *** [foo.o] Error 1
+```
+
+```
+## Start sampling
+```
+
+```
+## 
+## SAMPLING FOR MODEL 'f53afefa5fd92239adec95c91ede857a' NOW (CHAIN 1).
+## Chain 1: 
+## Chain 1: Gradient evaluation took 2e-05 seconds
+## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.2 seconds.
+## Chain 1: Adjust your expectations accordingly!
+## Chain 1: 
+## Chain 1: 
+## Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 1: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 1: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 1: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 1: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 1: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 1: 
+## Chain 1:  Elapsed Time: 0.032742 seconds (Warm-up)
+## Chain 1:                0.031291 seconds (Sampling)
+## Chain 1:                0.064033 seconds (Total)
+## Chain 1: 
+## 
+## SAMPLING FOR MODEL 'f53afefa5fd92239adec95c91ede857a' NOW (CHAIN 2).
+## Chain 2: 
+## Chain 2: Gradient evaluation took 1.1e-05 seconds
+## Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.11 seconds.
+## Chain 2: Adjust your expectations accordingly!
+## Chain 2: 
+## Chain 2: 
+## Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 2: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 2: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 2: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 2: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 2: 
+## Chain 2:  Elapsed Time: 0.032602 seconds (Warm-up)
+## Chain 2:                0.030983 seconds (Sampling)
+## Chain 2:                0.063585 seconds (Total)
+## Chain 2: 
+## 
+## SAMPLING FOR MODEL 'f53afefa5fd92239adec95c91ede857a' NOW (CHAIN 3).
+## Chain 3: 
+## Chain 3: Gradient evaluation took 1.7e-05 seconds
+## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.17 seconds.
+## Chain 3: Adjust your expectations accordingly!
+## Chain 3: 
+## Chain 3: 
+## Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 3: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 3: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 3: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 3: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 3: 
+## Chain 3:  Elapsed Time: 0.032369 seconds (Warm-up)
+## Chain 3:                0.030326 seconds (Sampling)
+## Chain 3:                0.062695 seconds (Total)
+## Chain 3: 
+## 
+## SAMPLING FOR MODEL 'f53afefa5fd92239adec95c91ede857a' NOW (CHAIN 4).
+## Chain 4: 
+## Chain 4: Gradient evaluation took 1.6e-05 seconds
+## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.16 seconds.
+## Chain 4: Adjust your expectations accordingly!
+## Chain 4: 
+## Chain 4: 
+## Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 4: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 4: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 4: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 4: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 4: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 4: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 4: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 4: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 4: 
+## Chain 4:  Elapsed Time: 0.035349 seconds (Warm-up)
+## Chain 4:                0.029458 seconds (Sampling)
+## Chain 4:                0.064807 seconds (Total)
+## Chain 4:
+```
+
+
+---
+
+# (c) Check that computations work correctly
+
+
+```r
+plot(mod)
+```
+
+&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# (c) Check that computations work correctly
+
+
+```r
+plot(mod, combo = c("parcoord", "rank_overlay"))
+```
+
+&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# (c) Check that computations work correctly
+
+
+```r
+summary(mod)
+```
+
+```
+##  Family: bernoulli 
+##   Links: mu = logit 
+## Formula: Low ~ LWT 
+##    Data: dat (Number of observations: 189) 
+##   Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+##          total post-warmup draws = 4000
+## 
+## Population-Level Effects: 
+##           Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+## Intercept     1.06      0.79    -0.44     2.68 1.00     3260     2527
+## LWT          -0.03      0.01    -0.06    -0.01 1.00     2845     2526
+## 
+## Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+## and Tail_ESS are effective sample size measures, and Rhat is the potential
+## scale reduction factor on split chains (at convergence, Rhat = 1).
+```
+
+
+---
+
+# (d) Check that the model fits the data well
+
+
+```r
+pp_check(mod)
+```
+
+```
+## Using 10 posterior draws for ppc type 'dens_overlay' by default.
+```
+
+&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-15-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# (d) Check that the model fits the data well
+
+
+```r
+pp_check(mod, type = "error_hist", ndraws = 11)
+```
+
+```
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+```
+
+&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-16-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# (d) Check that the model fits the data well
+
+
+```r
+pp_check(mod, type = "scatter_avg")
+```
+
+```
+## Using all posterior draws for ppc type 'scatter_avg' by default.
+```
+
+&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# (d) Check that the model fits the data well
+
+
+```r
+pp_check(mod, ndraws = 100, type = "bars")
+```
+
+&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-18-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# (e) Compare to other more or less complicated models
+
+Extend the model by adding smoking status
+
+
+```r
+mod2 &lt;- brm(
+  Low ~ LWT + Smoker, data = dat, 
+  family = bernoulli(),
+  prior = c(
+    set_prior("normal(0, 0.4)", "b", coef = "LWT"),
+    set_prior("normal(0, 2)", "b", coef = "SmokerTRUE")
+  ))
+```
+
+```
+## Compiling Stan program...
+```
+
+```
+## Trying to compile a simple C file
+```
+
+```
+## Running /Library/Frameworks/R.framework/Resources/bin/R CMD SHLIB foo.c
+## clang -mmacosx-version-min=10.13 -I"/Library/Frameworks/R.framework/Resources/include" -DNDEBUG   -I"/Library/Frameworks/R.framework/Versions/4.1/Resources/library/Rcpp/include/"  -I"/Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include/"  -I"/Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include/unsupported"  -I"/Library/Frameworks/R.framework/Versions/4.1/Resources/library/BH/include" -I"/Library/Frameworks/R.framework/Versions/4.1/Resources/library/StanHeaders/include/src/"  -I"/Library/Frameworks/R.framework/Versions/4.1/Resources/library/StanHeaders/include/"  -I"/Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppParallel/include/"  -I"/Library/Frameworks/R.framework/Versions/4.1/Resources/library/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DBOOST_NO_AUTO_PTR  -include '/Library/Frameworks/R.framework/Versions/4.1/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include   -fPIC  -Wall -g -O2  -c foo.c -o foo.o
+## In file included from &lt;built-in&gt;:1:
+## In file included from /Library/Frameworks/R.framework/Versions/4.1/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:13:
+## In file included from /Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include/Eigen/Dense:1:
+## In file included from /Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include/Eigen/Core:88:
+## /Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include/Eigen/src/Core/util/Macros.h:628:1: error: unknown type name 'namespace'
+## namespace Eigen {
+## ^
+## /Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include/Eigen/src/Core/util/Macros.h:628:16: error: expected ';' after top level declarator
+## namespace Eigen {
+##                ^
+##                ;
+## In file included from &lt;built-in&gt;:1:
+## In file included from /Library/Frameworks/R.framework/Versions/4.1/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:13:
+## In file included from /Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include/Eigen/Dense:1:
+## /Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include/Eigen/Core:96:10: fatal error: 'complex' file not found
+## #include &lt;complex&gt;
+##          ^~~~~~~~~
+## 3 errors generated.
+## make: *** [foo.o] Error 1
+```
+
+```
+## Start sampling
+```
+
+```
+## 
+## SAMPLING FOR MODEL '882865a148ed12a39c4741333734be5a' NOW (CHAIN 1).
+## Chain 1: 
+## Chain 1: Gradient evaluation took 2.3e-05 seconds
+## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.23 seconds.
+## Chain 1: Adjust your expectations accordingly!
+## Chain 1: 
+## Chain 1: 
+## Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 1: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 1: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 1: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 1: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 1: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 1: 
+## Chain 1:  Elapsed Time: 0.048876 seconds (Warm-up)
+## Chain 1:                0.039154 seconds (Sampling)
+## Chain 1:                0.08803 seconds (Total)
+## Chain 1: 
+## 
+## SAMPLING FOR MODEL '882865a148ed12a39c4741333734be5a' NOW (CHAIN 2).
+## Chain 2: 
+## Chain 2: Gradient evaluation took 1.9e-05 seconds
+## Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.19 seconds.
+## Chain 2: Adjust your expectations accordingly!
+## Chain 2: 
+## Chain 2: 
+## Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 2: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 2: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 2: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 2: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 2: 
+## Chain 2:  Elapsed Time: 0.058135 seconds (Warm-up)
+## Chain 2:                0.033979 seconds (Sampling)
+## Chain 2:                0.092114 seconds (Total)
+## Chain 2: 
+## 
+## SAMPLING FOR MODEL '882865a148ed12a39c4741333734be5a' NOW (CHAIN 3).
+## Chain 3: 
+## Chain 3: Gradient evaluation took 1e-05 seconds
+## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.1 seconds.
+## Chain 3: Adjust your expectations accordingly!
+## Chain 3: 
+## Chain 3: 
+## Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 3: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 3: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 3: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 3: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 3: 
+## Chain 3:  Elapsed Time: 0.054489 seconds (Warm-up)
+## Chain 3:                0.028261 seconds (Sampling)
+## Chain 3:                0.08275 seconds (Total)
+## Chain 3: 
+## 
+## SAMPLING FOR MODEL '882865a148ed12a39c4741333734be5a' NOW (CHAIN 4).
+## Chain 4: 
+## Chain 4: Gradient evaluation took 1.1e-05 seconds
+## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.11 seconds.
+## Chain 4: Adjust your expectations accordingly!
+## Chain 4: 
+## Chain 4: 
+## Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 4: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 4: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 4: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 4: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 4: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 4: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 4: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 4: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 4: 
+## Chain 4:  Elapsed Time: 0.057193 seconds (Warm-up)
+## Chain 4:                0.035299 seconds (Sampling)
+## Chain 4:                0.092492 seconds (Total)
+## Chain 4:
+```
+
+
+---
+
+# (e) Compare to other more or less complicated models
+
+
+```r
+plot(mod2)
+```
+
+&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-20-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# (e) Leave-one-out Cross-validation
+
+
+```r
+loo1 &lt;- loo(mod, model_names = "LWT")
+loo2 &lt;- loo(mod2, model_names = "LWT+Smoker")
+loo_compare(loo1, loo2)
+```
+
+```
+##            elpd_diff se_diff
+## LWT+Smoker  0.0       0.0   
+## LWT        -1.1       2.1
+```
+
+
+---
+
+# Examine the model outputs
+
+
+```r
+conditional_effects(mod)
+```
+
+&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-22-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Examine the model outputs
+
+
+```r
+conditional_effects(
+  mod2, effects = "LWT",
+  conditions = data.frame(Smoker = c(FALSE, TRUE),
+                          cond__ = c("Non-smoker", "Smoker")))
+```
+
+&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-23-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Posterior intervals
+
+
+```r
+mcmc_plot(mod2)
+```
+
+&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-24-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Joint Posterior Density
+
+
+```r
+mcmc_plot(mod2, variable = c("b_LWT", "b_SmokerTRUE"), 
+          type = "scatter")
+```
+
+&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-25-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Joint Posterior Density
+
+
+```r
+mcmc_plot(mod2, type = "pairs")
+```
+
+&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-26-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Joint Posterior Density
+
+What's the probability the both `\(\beta_{LWT} &gt; 0\)` and `\(\beta_{Smoker} &lt; 0\)`, i.e., that smoking is protective and the probability of low birthweight increases with mother's weight?
+
+
+```r
+df &lt;- as_draws_df(mod2)
+head(df)
+```
+
+```
+## # A draws_df: 6 iterations, 1 chains, and 4 variables
+##   b_Intercept  b_LWT b_SmokerTRUE lp__
+## 1        1.51 -0.049         1.05 -118
+## 2        1.55 -0.048         0.96 -117
+## 3        0.26 -0.025         0.34 -118
+## 4        1.70 -0.055         1.33 -120
+## 5        0.93 -0.043         1.27 -119
+## 6        0.36 -0.030         1.24 -117
+## # ... hidden reserved variables {'.chain', '.iteration', '.draw'}
+```
+
+
+---
+
+# Joint Posterior Density
+
+
+```r
+df %&gt;% 
+  summarise(prob = mean(b_LWT &gt; 0 &amp; b_SmokerTRUE &lt; 0))
+```
+
+```
+## # A tibble: 1 × 1
+##    prob
+##   &lt;dbl&gt;
+## 1     0
+```
+
+---
+
+# Joint Posterior Density
+
+What's the probability that the odds ratio associated with a 1 kg difference in mother's weight is between 0.99 and 1.01?
+
+
+```r
+df %&gt;% 
+  mutate(
+    OR = exp(b_LWT),
+    in_range = between(OR, .99, 1.01)
+    ) %&gt;% 
+  summarise(prob = mean(in_range))
+```
+
+```
+## # A tibble: 1 × 1
+##     prob
+##    &lt;dbl&gt;
+## 1 0.0605
+```
+
 
 
 ---

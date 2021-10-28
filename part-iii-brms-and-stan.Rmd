@@ -18,6 +18,12 @@ knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(cache = TRUE)
 ```
 
+```{r, echo=FALSE, message=FALSE}
+library(tidyverse)
+theme_set(theme_bw())
+```
+
+
 
 # Outline for Part III
 
@@ -69,12 +75,31 @@ knitr::opts_chunk$set(cache = TRUE)
 
 ---
 
+# Stan?
+
+.pull-left[
+[Stanisław Ulam](https://en.wikipedia.org/wiki/Stanislaw_Ulam)
+
+> a Polish scientist in the fields of mathematics and nuclear physics. He participated in the Manhattan Project, originated the Teller–Ulam design of thermonuclear weapons, discovered the concept of the cellular automaton, invented the Monte Carlo method of computation, and suggested nuclear pulse propulsion
+]
+.pull-right[
+<img src="figures/Stanislaw_Ulam.jpg" height=400>
+]
+
+
+---
+
 # brms
 
 ```{r}
 library(brms)
 ```
 
+
+.footnote[
+Bürkner, Paul-Christian. “brms: An R Package for Bayesian Multilevel Models Using Stan.” Journal of Statistical Software 80, no. 1 (August 29, 2017): 1–28. https://doi.org/10.18637/jss.v080.i01.
+Bürkner, Paul-Christian. “Advanced Bayesian Multilevel Modeling with the R Package Brms.” The R Journal 10, no. 1 (2018): 395–411. https://doi.org/10.32614/RJ-2018-017.
+]
 
 ---
 
@@ -90,21 +115,292 @@ head(dat)
 
 # Fitting a logistic regression model with brms
 
-```{r, eval=FALSE}
+```r
 mod <- brm(Low ~ LWT, data = dat, family = bernoulli())
+## Compiling Stan program...
+## Start sampling
+## 
+## SAMPLING FOR MODEL 'd3c8392ac3fcb0c96e96bdaad5582435' NOW (CHAIN 1).
+## Chain 1: 
+## Chain 1: Gradient evaluation took 2.1e-05 seconds
+## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.21 seconds.
+## Chain 1: Adjust your expectations accordingly!
+## Chain 1: 
+## Chain 1: 
+## Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 1: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## ...
+## Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 4: 
+## Chain 4:  Elapsed Time: 0.058381 seconds (Warm-up)
+## Chain 4:                0.054892 seconds (Sampling)
+## Chain 4:                0.113273 seconds (Total)
+## Chain 4: 
 ```
-
 
 
 ---
 
 # Fitting a logistic regression model with brms
 
-Very similar to this:
+
+```{r, eval=TRUE}
+mod <- brm(Low ~ LWT, data = dat, family = bernoulli())
+```
+
+is very similar to
 
 ```{r, eval=FALSE}
-mod <- glm(Low ~ LWT, data = dat, family = binomial())
+mod_glm <- glm(Low ~ LWT, data = dat, family = binomial())
 ```
+
+- `family = binomial()` would work with brms too, but is not the standard syntax.
+
+---
+
+# Model output
+
+```{r}
+summary(mod)
+```
+
+---
+
+class: inverse, middle, center
+
+# Let's try to use the Bayesian workflow
+
+---
+
+# (a) Exploratory Data Analysis
+
+- Important, but not particularly related to brms. 
+
+---
+
+# (b) Prior Distribution
+
+In the previous lecture we decided on using a normal prior for $\beta_{LWT}$ with mean 0 and standard deviation 0.4.
+
+We start by getting the default prior:
+
+```{r}
+prior <- get_prior(Low ~ LWT, family = bernoulli(), 
+                   data = dat)
+print(prior, show_df = FALSE)
+```
+
+- "b" denotes all population-level parameters
+- "b_LWT" denotes the particular LWT parameter
+- "Intercept" is what it is.
+
+---
+
+# (b) Prior Distribution
+
+Update to get what we want:
+
+```{r}
+prior$prior[2] <- "normal(0, 0.4)"
+```
+
+--
+
+Check that prior is updated:
+
+```{r}
+print(prior, show_df = FALSE)
+```
+
+---
+
+# (c) Check that the computations work correctly
+
+Then we have to fit the model first, with our preferred prior:
+
+```{r, eval=TRUE}
+mod <- brm(Low ~ LWT, data = dat, family = bernoulli(),
+           prior = prior)
+```
+
+
+---
+
+# (c) Check that computations work correctly
+
+```{r, eval=TRUE, dev='svg', fig.height=4}
+plot(mod)
+```
+
+---
+
+# (c) Check that computations work correctly
+
+```{r, eval=TRUE, dev='svg', fig.height=4}
+plot(mod, combo = c("parcoord", "rank_overlay"))
+```
+
+
+---
+
+# (c) Check that computations work correctly
+
+```{r}
+summary(mod)
+```
+
+
+---
+
+# (d) Check that the model fits the data well
+
+```{r, eval=TRUE, dev='svg', fig.height=4}
+pp_check(mod)
+```
+
+---
+
+# (d) Check that the model fits the data well
+
+```{r, eval=TRUE, dev='svg', fig.height=4}
+pp_check(mod, type = "error_hist", ndraws = 11)
+```
+
+---
+
+# (d) Check that the model fits the data well
+
+```{r, eval=TRUE, dev='svg', fig.height=4}
+pp_check(mod, type = "scatter_avg")
+```
+
+---
+
+# (d) Check that the model fits the data well
+
+```{r, eval=TRUE, dev='svg', fig.height=4}
+pp_check(mod, ndraws = 100, type = "bars")
+```
+
+
+---
+
+# (e) Compare to other more or less complicated models
+
+Extend the model by adding smoking status
+
+```{r}
+mod2 <- brm(
+  Low ~ LWT + Smoker, data = dat, 
+  family = bernoulli(),
+  prior = c(
+    set_prior("normal(0, 0.4)", "b", coef = "LWT"),
+    set_prior("normal(0, 2)", "b", coef = "SmokerTRUE")
+  ))
+```
+
+
+---
+
+# (e) Compare to other more or less complicated models
+
+```{r, eval=TRUE, dev='svg', fig.height=4}
+plot(mod2)
+```
+
+
+---
+
+# (e) Leave-one-out Cross-validation
+
+```{r}
+loo1 <- loo(mod, model_names = "LWT")
+loo2 <- loo(mod2, model_names = "LWT+Smoker")
+loo_compare(loo1, loo2)
+```
+
+
+---
+
+# Examine the model outputs
+
+```{r}
+conditional_effects(mod)
+```
+
+---
+
+# Examine the model outputs
+
+```{r}
+conditional_effects(
+  mod2, effects = "LWT",
+  conditions = data.frame(Smoker = c(FALSE, TRUE),
+                          cond__ = c("Non-smoker", "Smoker")))
+```
+
+---
+
+# Posterior intervals
+
+```{r}
+mcmc_plot(mod2)
+```
+
+---
+
+# Joint Posterior Density
+
+```{r, dev='svg', fig.height=4, fig.width=6}
+mcmc_plot(mod2, variable = c("b_LWT", "b_SmokerTRUE"), 
+          type = "scatter")
+```
+
+---
+
+# Joint Posterior Density
+
+```{r, dev='svg', fig.height=4, fig.width=6}
+mcmc_plot(mod2, type = "pairs")
+```
+
+---
+
+# Joint Posterior Density
+
+What's the probability the both $\beta_{LWT} > 0$ and $\beta_{Smoker} < 0$, i.e., that smoking is protective and the probability of low birthweight increases with mother's weight?
+
+```{r}
+df <- as_draws_df(mod2)
+head(df)
+```
+
+
+---
+
+# Joint Posterior Density
+
+```{r}
+df %>% 
+  summarise(prob = mean(b_LWT > 0 & b_SmokerTRUE < 0))
+```
+
+---
+
+# Joint Posterior Density
+
+What's the probability that the odds ratio associated with a 1 kg difference in mother's weight is between 0.99 and 1.01?
+
+```{r}
+df %>% 
+  mutate(
+    OR = exp(b_LWT),
+    in_range = between(OR, .99, 1.01)
+    ) %>% 
+  summarise(prob = mean(in_range))
+```
+
 
 
 ---
