@@ -46,7 +46,7 @@ knitr::opts_chunk$set(cache = TRUE)
 
 - Please remember, comments and questions are **always** welcome!
 
-- Presentations and other course material available at https://github.com/osorensen/BayesCourseEPINOR2021
+- Presentations and other course material available at https://osorensen.github.io/BayesCourseEPINOR2021/
 
 
 ---
@@ -150,7 +150,7 @@ For a random person taken from the population, what is the probability of diseas
 
 - Sensitivity: $P(B|A)$, (positive test given sick). 
 
-- Base rate: $P(A)$ (sick). 
+- Prevalence: $P(A)$. 
 
 - Positive test $P(B)$: 
 
@@ -163,7 +163,7 @@ For a random person taken from the population, what is the probability of diseas
   
 # Positive test
 
-- Total probability equals probability given sick plus probability given not sick. $\bar{A}$ bar means "not A": 
+- Total probability equals probability given sick plus probability given not sick. $\bar{A}$ means "not A": 
   
 $$P(B) = P(B|\bar{A}) + P(B|A)$$
 --
@@ -194,7 +194,45 @@ $$P(A|B) = \frac{P(B|A)P(A)}{P(B)} = \frac{P(B|A)P(A)}{1-P(\bar{B}|\bar{A}) + P(
 Why useful?
 
 $$\text{unknown thing} = \text{formula with known things} $$
+Known things:
 
+  - Sensitivity $P(B|A)$
+  
+  - Prevalence $P(A)$
+  
+  - Specificity $P(\bar{B}|\bar{A})$
+
+
+---
+
+# Bayes and Statistics
+
+From 1761 and 200 years forward, Bayes' work did not have much influence on data analysis.
+
+
+---
+
+# Bayes and Statistics
+
+Statistics at the time was about counting.
+
+.pull-left[
+![](figures/John_Snow.jpeg)
+]
+.pull-right[
+![](figures/Snow-cholera-map.jpeg)
+]
+
+.footnote[Pictures from https://no.wikipedia.org/wiki/John_Snow]
+
+
+---
+
+# Bayes and Statistics
+
+- Modern statistics founded by people like Karl Pearson, Sir Ronald Fisher, Egon Pearson, and Jerzy Neyman early in the 20th century.
+
+- So-called frequentist statistics, which is what most of you probably are most familiar with.
 
 
 ---
@@ -276,6 +314,18 @@ Hence, under H0 the expected **frequency** of seeing a deviation this big is $1.
 
 ---
 
+# Significance Testing
+
+Magic 5 % cutoff for significance.
+
+<center>
+<img src="figures/sig_threshold.jpg" height=150>
+</center>
+
+.footnote[Cowles, M., & Davis, C. (1982). On the origins of the .05 level of statistical significance. American Psychologist, 37(5), 553–558. https://doi.org/10.1037/0003-066X.37.5.553]
+
+---
+
 # Some Points for Discussion
 
 - Is it ever possible that the null hypothesis is literally true? 
@@ -329,8 +379,6 @@ $$\underbrace{p(\beta | \text{data})}_{\color{red}{\text{want to know}}} = \unde
 
 
 
-
-
 ---
 
 class: inverse, middle, center
@@ -345,7 +393,12 @@ class: inverse, middle, center
 
 - Should be defined **before** looking at the data, just like tests in a frequentist analysis should predefined to avoid p-hacking.
 
-  - Which of course often is impossible in practice, but still good to keep in mind.
+  - That being said, just like in frequentist analysis, we should examine whether the model is a good fit to the data, compare different models, etc.
+
+- For some reflections on how to preregister a Bayesian analysis, see Schad et al. (2020), p. 106.
+  
+  
+.footnote[Schad, Daniel J., Michael Betancourt, and Shravan Vasishth. “Toward a Principled Bayesian Workflow in Cognitive Science.” Psychological Methods, 2020. https://doi.org/10.1037/met0000275.]
 
 
 ---
@@ -364,7 +417,7 @@ p <- tibble(beta = seq(from = -60, to = 60, by = 1)) %>%
   ggplot(aes(x = beta, y = p)) + 
   geom_line() + 
   ggtitle("Weakly informative prior") + 
-  xlab(expression(beta)) + 
+  xlab(latex2exp::TeX("Potential values of $\\beta$")) + 
   ylab("Probability")
 p
 ```
@@ -403,7 +456,7 @@ tibble(beta = seq(from = -1000, to = 1000, by = 1)) %>%
   ggplot(aes(x = beta, y = p)) + 
   geom_line() + 
   ggtitle("Uniform prior") + 
-  xlab(expression(beta)) + 
+  xlab(latex2exp::TeX("Potential values of $\\beta$")) + 
   ylab("Probability")
 ```
 
@@ -417,6 +470,8 @@ tibble(beta = seq(from = -1000, to = 1000, by = 1)) %>%
 $p(\text{data} | \beta)$ is the likelihood. For linear regression it is related to the residual sum of squares
 
 $$RSS(\beta) = \sum_{i=1}^{n} \{y_{i} - (\beta_{0} + \beta x_{i})\}^2$$ 
+
+### Discussion point
 
 - What is the red dot? Is it related to frequentist linear regression?
 
@@ -438,15 +493,15 @@ plot_df <- ToothGrowth %>%
 p1 <- ggplot(plot_df, aes(x = beta, y = rss)) + 
   geom_line() + 
   geom_point(data = filter(plot_df, rss == min(rss)), color = "red", size = 2) + 
-  xlab(expression(beta)) +
-  ylab(expression(RSS(beta))) 
+  xlab(latex2exp::TeX("Potential values of $\\beta$")) +
+  ylab(latex2exp::TeX("Residual sum of squares")) 
 
 p2 <- ggplot(plot_df, aes(x = beta, y = exp(-rss))) + 
   geom_line() + 
   geom_point(data = tibble(beta = coef(linreg)[[2]], rss = mean(residuals(linreg)^2)),
              color = "red", size = 2) +
-  xlab(expression(beta)) +
-  ylab(latex2exp::TeX("$p(data|\\beta)$")) 
+  xlab(latex2exp::TeX("Potential values of $\\beta$")) +
+  ylab("Likelihood") 
 
 p1 + p2 + plot_layout(ncol = 1)
 ```
@@ -478,7 +533,7 @@ and let the software deal with it.
 
 # Piece 3 - Normalizing Constant
 
-The funny sign $\propto$ means *is proportional to*, and the lack of a normalizing constant means that we can get *unnormalized* probabilities:
+The funny sign $\propto$ means *is proportional to*, and the lack of a normalizing constant means that we can get *unnormalized* probabilities. Example:
 
 ```{r, echo=FALSE}
 tibble(beta = c(1, 2, 3), Probability = c(4.5, 9, 7)) %>% 

@@ -34,6 +34,41 @@ class: inverse, middle, center
 
 
 
+
+---
+
+# Workflow?
+
+.pull-left[
+
+### Idealized case
+
+- Preregister hypotheses to be tested.
+
+- Get the data.
+
+- Fit models. Perform model selection based on recipe defined at preregistration.
+
+- Report confidence intervals and p-values for tests that were preregistered.
+
+]
+--
+.pull-right[
+
+### Real life?
+
+1. Have some questions you want to investigate.
+
+2. Exploratory data analysis.
+
+3. Try to fit some models, but it crashes. Realize that the model you planned won't work that way. Go back to 1. and repeat.
+
+4. Find some interesting patterns that you hadn't thought of. Is it signal or noise?
+
+5. Go back and forth for a while, then submit paper.
+
+]
+
 ---
 
 # Bayesian Workflow?
@@ -41,6 +76,9 @@ class: inverse, middle, center
 Gelman et al. (2021) write
 
 &gt; Using Bayesian inference to solve real-world problems requires not only statistical skills, subject matter knowledge, and programming, but also awareness of the decisions made in the process of data analysis. All of these aspects can be understood as part of a tangled workflow of applied Bayesian statistics.
+
+
+
 
 .footnote[Gelman, A., Vehtari, A., Simpson, D., Margossian, C. C., Carpenter, B., Yao, Y., Kennedy, L., Gabry, J., Bürkner, P.-C., &amp; Modrák, M. (2020). Bayesian Workflow. ArXiv:2011.01808 [Stat]. http://arxiv.org/abs/2011.01808]
 
@@ -129,83 +167,57 @@ Research question:
 
 Possible confounding factors are age, smoking status, and hypertension.
 
+
 ---
 
 # (a) Exploratory data analysis
 
-Women with lower weight have higher probabilty of low birthweight.
+Goals:
+
+- Plotting the data helps reveal if something is completely wrong
+
+  - e.g., missing values coded as -999
+  
+- Might show patterns of relevance to modeling
+
+  - at the risk of p-hacking, but there is always a tradeoff here
+
+
+---
+
+# (a) Exploratory data analysis
+
+Some tendency that women with higher weight have lower probability of low birthweight?
 
 &lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-6-1.svg" style="display: block; margin: auto;" /&gt;
 
+.footnote[Number of observations in each group indicated in red.]
 
 ---
 
 # (a) Exploratory data analysis
 
-.pull-left[
-Weaker relationship when stratifying by smoking status?
+
+Does stratifying by smoking status change the relationship?
 
 &lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-7-1.svg" style="display: block; margin: auto;" /&gt;
-]
---
-.pull-right[
 
-Reasonable numbers in each group:
+.footnote[Values from last slide in gray.]
 
-
-```r
-dat %&gt;% 
-  group_by(Low, Smoker) %&gt;% 
-  count()
-```
-
-```
-## # A tibble: 4 × 3
-## # Groups:   Low, Smoker [4]
-##     Low Smoker     n
-##   &lt;int&gt; &lt;lgl&gt;  &lt;int&gt;
-## 1     0 FALSE     86
-## 2     0 TRUE      44
-## 3     1 FALSE     29
-## 4     1 TRUE      30
-```
-
-]
 
 ---
 
 # (a) Exploratory data analysis
 
 
-.pull-left[
+
 What about hypertension?
 
-&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
-]
---
-.pull-right[
 
-Small group sizes, so we should take the plots with a grain of salt.
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-8-1.svg" style="display: block; margin: auto;" /&gt;
 
 
-```r
-dat %&gt;% 
-  group_by(Low, Hypertension) %&gt;% 
-  count()
-```
 
-```
-## # A tibble: 4 × 3
-## # Groups:   Low, Hypertension [4]
-##     Low Hypertension     n
-##   &lt;int&gt; &lt;lgl&gt;        &lt;int&gt;
-## 1     0 FALSE          125
-## 2     0 TRUE             5
-## 3     1 FALSE           52
-## 4     1 TRUE             7
-```
-
-]
 
 ---
 
@@ -213,7 +225,7 @@ dat %&gt;%
 
 Hard to claim that there is a relationship between age and low birthweight:
 
-&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -221,15 +233,11 @@ Hard to claim that there is a relationship between age and low birthweight:
 
 Logistic regression model seems appropriate.
 
-- Initial model of the form 
-
-`Low ~ LWT`
+- Initial model of the form using LWT as explanatory variable.
 
 - We believe that smoking status might be an important covariate to include.
 
-- Will also include age, so the most complex model becomes:
-
-`Low ~ LWT + Age + Smoker`.
+- Will also include age, so the most complex model also includes Smoking status and Age.
 
 
 ---
@@ -243,15 +251,17 @@ These simulated plots show such a situation:
 
 
 .pull-left[
-&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 --
 .pull-right[
-&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
 
 ]
 
-The plots definitely suggest that we should include hypertension in the model.
+--
+
+Interaction might be useful?
 
 
 ---
@@ -281,15 +291,17 @@ Prior predictive simulations:
 
 # (b) Quantify prior knowledge
 
-An example to make what's coming seem more sensible. Assuming `\(\beta_{LWT}=-0.10\)`, we can make the following plot to interpret the effect:
+An example to make what's coming seem more sensible. 
+
+Assuming `\(\beta_{LWT}=-0.10\)`, we can make the following plot to interpret the effect:
 
 
 
 .pull-left[
-&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-16-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
-&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-15-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 
@@ -299,7 +311,7 @@ An example to make what's coming seem more sensible. Assuming `\(\beta_{LWT}=-0.
 
 Let's start by assuming a very wide prior distribution for `\(\beta_{LWT}\)`&lt;sup&gt;1&lt;/sup&gt;. Normal with mean 0 and standard deviation 100.
 
-&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-18-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-16-1.svg" style="display: block; margin: auto;" /&gt;
 
 We would give 19:1 odds that the true `\(\beta_{LWT}\)` is between -200 and +200. And 1:1 odds that `\(\beta_{LWT}\)` is below or above 0.
 
@@ -314,10 +326,10 @@ Continuing with our wide prior distribution, here is what it means in terms of o
 
 
 .pull-left[
-&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-20-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-18-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
-&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-21-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-19-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 We would probably give more than 19:1 odds that the odds ratio is lower than this!
@@ -329,7 +341,7 @@ We would probably give more than 19:1 odds that the odds ratio is lower than thi
 
 We can try to be a bit more informative. Let the prior be normal with mean 0 and standard deviation 1.
 
-&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-22-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-20-1.svg" style="display: block; margin: auto;" /&gt;
 
 We would give 19:1 odds that the true `\(\beta_{LWT}\)` is between -2 and +2. And 1:1 odds that `\(\beta_{LWT}\)` is below or above 0.
 
@@ -343,10 +355,10 @@ It goes in the sensible direction, but the extreme ends are still crazy.
 
 
 .pull-left[
-&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-24-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-22-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
-&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-25-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-23-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 We would probably give more than 19:1 odds that the odds ratio is lower than this!
@@ -357,7 +369,7 @@ We would probably give more than 19:1 odds that the odds ratio is lower than thi
 
 We can try to be even a bit more informative. Let the prior be normal with mean 0 and standard deviation 0.2.
 
-&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-26-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-24-1.svg" style="display: block; margin: auto;" /&gt;
 
 We would give 19:1 odds that the true `\(\beta_{LWT}\)` is between -0.4 and +0.4. And 1:1 odds that `\(\beta_{LWT}\)` is below or above 0.
 
@@ -371,13 +383,14 @@ We still allow quite large effects within our 95 % prior limits, but the prior b
 
 
 .pull-left[
-&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-28-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-26-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
-&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-29-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-27-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 Seems kind of reasonable to give 19:1 odds that the odds ratio is somewhere between the red and the blue curves?
+
 
 ---
 
@@ -450,10 +463,13 @@ class: inverse
 - R packages can solve a lot, but some knowledge of the algorithms is need.
 ]
 .pull-right[
+Example, posterior distribution for `\(\beta_{LWT}\)`
 &lt;center&gt;
 &lt;img src="figures/posterior_example.png"&gt;
 &lt;/center&gt;
 ]
+
+
 
 ---
 
@@ -466,15 +482,53 @@ It should look random, like this.
 &lt;/center&gt;
 
 
+or the infant very hungry caterpillar
+&lt;img src="figures/caterpillar.gif" height=100&gt;
+
+
 ---
 
-# (c) Check traceplot
+# Why should traceplot look random?
 
-And rather not like this. Algorithm gets stuck at each random number.
+.pull-left[
+Metropolis-Hastings algorithm works like this:
 
-&lt;center&gt;
-&lt;img src="figures/bad_trace_plot_example.png" height="300"&gt;
-&lt;/center&gt;
+1. Start at some value `\(\beta_{1}\)`.
+
+2. Suggest a new `\(\beta_{2}\)`. 
+
+3. If `\(\beta_{2}\)` has higher prob. than `\(\beta_{1}\)`, flip a coin and decide whether to take it. If it's worse, keep `\(\beta_{1}\)`.
+
+4. Go on and on and on, with `\(\beta_{3}, \beta_{4}, \dots\)`
+
+In the end, all `\(\beta\)` values give you the posterior distribution.
+
+]
+.pull-right[
+
+
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-29-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+
+
+]
+
+.footnote[Example based on [this blog post](https://stephens999.github.io/fiveMinuteStats/MH-examples1.html).]
+
+---
+
+# Why is it bad?
+
+.pull-left[
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-30-1.svg" style="display: block; margin: auto;" /&gt;
+
+]
+.pull-right[
+
+&lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-31-1.svg" style="display: block; margin: auto;" /&gt;
+
+]
 
 
 ---
@@ -514,7 +568,7 @@ When re-generating 100 random datasets with same weight of mother, using the est
 
 # Posterior predictive check 2
 
-Logistic regression predicts the probability. Is the a relationship between the predicted probability and the error rate?
+Logistic regression predicts the probability. Is there a relationship between the predicted probability and the error rate?
 
 &lt;center&gt;
 &lt;img src="figures/pp_error_binned_example.png" height="400"&gt;
@@ -612,6 +666,17 @@ Bayesian twists here as well:
 ```
 
 ---
+
+# Next step?
+
+- We have taken a lot of steps, but now are confident that our models work well for these data.
+
+- We can now look into the posterior distributions to actually answer our analysis questions. 
+
+- We'll do this with R code after the break.
+
+---
+
 
 class: center, middle
 

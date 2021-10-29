@@ -20,6 +20,8 @@ knitr::opts_chunk$set(cache = TRUE)
 
 ```{r, echo=FALSE, message=FALSE}
 library(tidyverse)
+library(gghalves)
+theme_set(theme_bw())
 library(latex2exp)
 ```
 
@@ -35,6 +37,41 @@ library(tidyverse)
 theme_set(theme_classic())
 ```
 
+
+---
+
+# Workflow?
+
+.pull-left[
+
+### Idealized case
+
+- Preregister hypotheses to be tested.
+
+- Get the data.
+
+- Fit models. Perform model selection based on recipe defined at preregistration.
+
+- Report confidence intervals and p-values for tests that were preregistered.
+
+]
+--
+.pull-right[
+
+### Real life?
+
+1. Have some questions you want to investigate.
+
+2. Exploratory data analysis.
+
+3. Try to fit some models, but it crashes. Realize that the model you planned won't work that way. Go back to 1. and repeat.
+
+4. Find some interesting patterns that you hadn't thought of. Is it signal or noise?
+
+5. Go back and forth for a while, then submit paper.
+
+]
+
 ---
 
 # Bayesian Workflow?
@@ -42,6 +79,9 @@ theme_set(theme_classic())
 Gelman et al. (2021) write
 
 > Using Bayesian inference to solve real-world problems requires not only statistical skills, subject matter knowledge, and programming, but also awareness of the decisions made in the process of data analysis. All of these aspects can be understood as part of a tangled workflow of applied Bayesian statistics.
+
+
+
 
 .footnote[Gelman, A., Vehtari, A., Simpson, D., Margossian, C. C., Carpenter, B., Yao, Y., Kennedy, L., Gabry, J., Bürkner, P.-C., & Modrák, M. (2020). Bayesian Workflow. ArXiv:2011.01808 [Stat]. http://arxiv.org/abs/2011.01808]
 
@@ -104,76 +144,95 @@ Research question:
 
 Possible confounding factors are age, smoking status, and hypertension.
 
----
-
-# (a) Exploratory data analysis
-
-Women with lower weight have higher probabilty of low birthweight.
-
-```{r, dev='svg', fig.align='center', fig.height=3, fig.width=5, echo=FALSE}
-ggplot(dat, aes(x = Low, y = LWT, fill = Low)) + 
-  geom_violin() + 
-  coord_flip() + 
-  theme(legend.position = "none")
-```
-
 
 ---
 
 # (a) Exploratory data analysis
 
-.pull-left[
-Weaker relationship when stratifying by smoking status?
+Goals:
+
+- Plotting the data helps reveal if something is completely wrong
+
+  - e.g., missing values coded as -999
+  
+- Might show patterns of relevance to modeling
+
+  - at the risk of p-hacking, but there is always a tradeoff here
+
+
+---
+
+# (a) Exploratory data analysis
+
+Some tendency that women with higher weight have lower probability of low birthweight?
 
 ```{r, dev='svg', fig.align='center', fig.height=3, fig.width=5, echo=FALSE}
-ggplot(dat, aes(x = Low, y = LWT, fill = Low)) + 
-  geom_violin() + 
-  coord_flip() + 
+df1 <- dat %>% 
+  mutate(LWT = cut_number(LWT, n = 5)) %>% 
+  group_by(LWT) %>% 
+  summarise(prop_low = mean(Low), n = n(), .groups = "drop")
+
+ggplot(df1, aes(x = LWT, y = prop_low)) +  
+  geom_point() + 
+  geom_text(aes(label = n), color = "red", hjust = 1.3) + 
   theme(legend.position = "none") + 
-  facet_wrap(vars(Smoker), labeller = as_labeller(function(x) paste("Smoker:", x)))
-```
-]
---
-.pull-right[
-
-Reasonable numbers in each group:
-
-```{r}
-dat %>% 
-  group_by(Low, Smoker) %>% 
-  count()
+  xlab("Weight") + 
+  ylab("Proportion with low birthweight")
 ```
 
-]
+.footnote[Number of observations in each group indicated in red.]
 
 ---
 
 # (a) Exploratory data analysis
 
 
-.pull-left[
+Does stratifying by smoking status change the relationship?
+
+```{r, dev='svg', fig.align='center', fig.height=3, fig.width=7, echo=FALSE}
+df2 <- dat %>% 
+  mutate(LWT = cut_number(LWT, n = 5)) %>% 
+  group_by(LWT, Smoker) %>% 
+  summarise(prop_low = mean(Low), n = n(), .groups = "drop")
+
+ggplot(df2, aes(x = LWT, y = prop_low)) +  
+  geom_point() + 
+  geom_point(data = df1, color = "gray") +
+  geom_text(hjust = 1.3, color = "red", aes(label = n)) + 
+  theme(legend.position = "none") + 
+  facet_wrap(vars(Smoker), labeller = as_labeller(function(x) paste("Smoker:", x))) + 
+  xlab("Weight") + 
+  ylab("Proportion with low birthweight")
+```
+
+.footnote[Values from last slide in gray.]
+
+
+---
+
+# (a) Exploratory data analysis
+
+
+
 What about hypertension?
 
-```{r, dev='svg', fig.align='center', fig.height=3, fig.width=5, echo=FALSE}
-ggplot(dat, aes(x = Low, y = LWT, fill = Low)) + 
-  geom_violin() + 
-  coord_flip() + 
-  theme(legend.position = "none") + 
-  facet_wrap(vars(Hypertension), labeller = as_labeller(function(x) paste("Hypertension:", x)))
-```
-]
---
-.pull-right[
 
-Small group sizes, so we should take the plots with a grain of salt.
-
-```{r}
+```{r, dev='svg', fig.align='center', fig.height=3, fig.width=7, echo=FALSE}
 dat %>% 
-  group_by(Low, Hypertension) %>% 
-  count()
+  mutate(LWT = cut_number(LWT, n = 5)) %>% 
+  group_by(LWT, Hypertension) %>% 
+  summarise(prop_low = mean(Low), n = n(), .groups = "drop") %>% 
+  ggplot(aes(x = LWT, y = prop_low, label = n)) +  
+  geom_point() + 
+  geom_text(hjust = 1.3, color = "red") + 
+  theme(legend.position = "none") + 
+  facet_wrap(vars(Hypertension), labeller = as_labeller(function(x) paste("Hypertension:", x))) + 
+  xlab("Weight") + 
+  ylab("Proportion with low birthweight")
 ```
 
-]
+
+
 
 ---
 
@@ -182,10 +241,16 @@ dat %>%
 Hard to claim that there is a relationship between age and low birthweight:
 
 ```{r, dev='svg', fig.align='center', fig.height=3, fig.width=5, echo=FALSE}
-ggplot(dat, aes(x = Low, y = Age, fill = Low)) + 
-  geom_violin() + 
-  coord_flip() + 
-  theme(legend.position = "none")
+dat %>% 
+  mutate(Age = cut_number(Age, n = 5)) %>% 
+  group_by(Age) %>% 
+  summarise(
+    prop_low = mean(Low), n = n(), .groups = "drop"
+  ) %>% 
+  ggplot(aes(x = Age, y = prop_low)) + 
+  geom_point() + 
+  theme(legend.position = "none") + 
+  ylab("Proportion with low birthweight")
 ```
 
 ---
@@ -194,15 +259,11 @@ ggplot(dat, aes(x = Low, y = Age, fill = Low)) +
 
 Logistic regression model seems appropriate.
 
-- Initial model of the form 
-
-`Low ~ LWT`
+- Initial model of the form using LWT as explanatory variable.
 
 - We believe that smoking status might be an important covariate to include.
 
-- Will also include age, so the most complex model becomes:
-
-`Low ~ LWT + Age + Smoker`.
+- Will also include age, so the most complex model also includes Smoking status and Age.
 
 
 ---
@@ -214,43 +275,50 @@ The plots shown above may not have given too much information on how to build th
 These simulated plots show such a situation:
 
 ```{r, echo=FALSE}
-plot_df <- crossing(
-  Low = c(FALSE, TRUE),
-  Hypertension = c(FALSE, TRUE)
+sim_df <- crossing(
+  Weight = c("(40, 50]", "(50, 60]", "(60, 70]", "(70, 80]"),
+  Smoker = c(FALSE, TRUE)
 ) %>% 
-  mutate(n = c(50, 200, 200, 50)) %>% 
-  uncount(n) %>% 
-  mutate(
-    m = case_when(
-      Low & Hypertension ~ 45,
-      Low & !Hypertension ~ 55,
-      !Low & Hypertension ~ 50,
-      TRUE ~ 60
-    ),
-    LWT = rnorm(nrow(.), mean = m, sd = 3)
-  )
+  mutate(n = c(80, 1, 60, 2, 20, 4, 20, 8))
+  
+sim_df1 <- sim_df %>% 
+  group_by(Weight) %>% 
+  summarise(n = sum(n), .groups = "drop") %>% 
+  mutate(n = n / sum(n))
 
-p <- ggplot(plot_df, aes(x = Low, y = LWT)) + 
-  geom_violin() + 
-  coord_flip()
+p1 <- ggplot(sim_df1, aes(x = Weight, y = n)) +  
+  geom_point() + 
+  theme(legend.position = "none") + 
+  xlab("Weight") + 
+  ylab("Proportion with low birthweight")
+
+p2 <- sim_df %>% 
+  group_by(Smoker) %>% 
+  mutate(n = n/sum(n)) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = Weight, y = n, color = Smoker)) +  
+  geom_point() + 
+  xlab("Weight") + 
+  ylab("Proportion with low birthweight")
 
 ```
 
 .pull-left[
 ```{r, dev='svg', fig.align='center', fig.height=4, fig.width=5, echo=FALSE}
-p
+p1
 ```
 ]
 --
 .pull-right[
 ```{r, dev='svg', fig.align='center', fig.height=4, fig.width=5, echo=FALSE}
-p  + facet_wrap(vars(Hypertension),
-                labeller = as_labeller(function(x) paste("Hypertension:", x)))
+p2
 ```
 
 ]
 
-The plots definitely suggest that we should include hypertension in the model.
+--
+
+Interaction might be useful?
 
 
 ---
@@ -280,7 +348,9 @@ $$\exp\left\{(LWT_{1}-LWT_{2}) \beta_{LWT}\right\} = \exp\left\{\Delta_{W} \beta
 
 # (b) Quantify prior knowledge
 
-An example to make what's coming seem more sensible. Assuming $\beta_{LWT}=-0.10$, we can make the following plot to interpret the effect:
+An example to make what's coming seem more sensible. 
+
+Assuming $\beta_{LWT}=-0.10$, we can make the following plot to interpret the effect:
 
 ```{r, echo=FALSE}
 plot_df <- tibble(
@@ -342,7 +412,7 @@ plot_df <- crossing(
 ```
 
 .pull-left[
-```{r, dev='svg', fig.align='center', fig.height=3, fig.width=3, echo=FALSE}
+```{r, dev='svg', fig.align='center', fig.height=3, fig.width=4, echo=FALSE}
 ggplot(plot_df, aes(x = delta_w, y = odds_ratio, group = factor(beta), color = factor(beta))) + 
   geom_line() +
   xlab("Weight difference") + 
@@ -351,7 +421,7 @@ ggplot(plot_df, aes(x = delta_w, y = odds_ratio, group = factor(beta), color = f
 ```
 ]
 .pull-right[
-```{r, dev='svg', fig.align='center', fig.height=3, fig.width=3, echo=FALSE, warning=FALSE}
+```{r, dev='svg', fig.align='center', fig.height=3, fig.width=4, echo=FALSE, warning=FALSE}
 ggplot(plot_df, aes(x = delta_w, y = odds_ratio, group = factor(beta), color = factor(beta))) + 
   geom_line() +
   scale_y_log10() +
@@ -397,7 +467,7 @@ plot_df <- crossing(
 ```
 
 .pull-left[
-```{r, dev='svg', fig.align='center', fig.height=3, fig.width=3, echo=FALSE}
+```{r, dev='svg', fig.align='center', fig.height=3, fig.width=4, echo=FALSE}
 ggplot(plot_df, aes(x = delta_w, y = odds_ratio, group = factor(beta), color = factor(beta))) + 
   geom_line() +
   xlab("Weight difference") + 
@@ -406,7 +476,7 @@ ggplot(plot_df, aes(x = delta_w, y = odds_ratio, group = factor(beta), color = f
 ```
 ]
 .pull-right[
-```{r, dev='svg', fig.align='center', fig.height=3, fig.width=3, echo=FALSE, warning=FALSE}
+```{r, dev='svg', fig.align='center', fig.height=3, fig.width=4, echo=FALSE, warning=FALSE}
 ggplot(plot_df, aes(x = delta_w, y = odds_ratio, group = factor(beta), color = factor(beta))) + 
   geom_line() +
   scale_y_log10() +
@@ -471,6 +541,7 @@ ggplot(plot_df, aes(x = delta_w, y = odds_ratio, group = factor(beta), color = f
 ]
 
 Seems kind of reasonable to give 19:1 odds that the odds ratio is somewhere between the red and the blue curves?
+
 
 ---
 
@@ -542,10 +613,13 @@ class: inverse
 - R packages can solve a lot, but some knowledge of the algorithms is need.
 ]
 .pull-right[
+Example, posterior distribution for $\beta_{LWT}$
 <center>
 <img src="figures/posterior_example.png">
 </center>
 ]
+
+
 
 ---
 
@@ -558,15 +632,101 @@ It should look random, like this.
 </center>
 
 
+or the infant very hungry caterpillar
+<img src="figures/caterpillar.gif" height=100>
+
+
 ---
 
-# (c) Check traceplot
+# Why should traceplot look random?
 
-And rather not like this. Algorithm gets stuck at each random number.
+.pull-left[
+Metropolis-Hastings algorithm works like this:
 
-<center>
-<img src="figures/bad_trace_plot_example.png" height="300">
-</center>
+1. Start at some value $\beta_{1}$.
+
+2. Suggest a new $\beta_{2}$. 
+
+3. If $\beta_{2}$ has higher prob. than $\beta_{1}$, flip a coin and decide whether to take it. If it's worse, keep $\beta_{1}$.
+
+4. Go on and on and on, with $\beta_{3}, \beta_{4}, \dots$
+
+In the end, all $\beta$ values give you the posterior distribution.
+
+]
+.pull-right[
+
+
+```{r, echo=FALSE, dev='svg', fig.height=6, fig.width=6, fig.align='center'}
+target = function(x){
+  if(x<0){
+    return(0)}
+  else {
+    return( exp(-x))
+  }
+}
+easyMCMC = function(niter, startval, proposalsd){
+  x = rep(0,niter)
+  x[1] = startval     
+  for(i in 2:niter){
+    currentx = x[i-1]
+    proposedx = rnorm(1,mean=currentx,sd=proposalsd) 
+    A = target(proposedx)/target(currentx)
+    if(runif(1)<A){
+      x[i] = proposedx       # accept move with probabily min(1,A)
+    } else {
+      x[i] = currentx        # otherwise "reject" move, and stay where we are
+    }
+  }
+  return(x)
+}
+
+z1=easyMCMC(1000,3,1)
+z2=easyMCMC(1000,3,10)
+z3=easyMCMC(1000,3,100)
+
+plot_df <- tibble(
+  Good = z1, Bad = z2, `Very bad` = z3,
+) %>% 
+  mutate(iteration = row_number()) %>% 
+  pivot_longer(cols = c("Good", "Bad", "Very bad")) %>% 
+  mutate(name = factor(name, levels = c("Good", "Bad", "Very bad")))
+
+p <- ggplot(plot_df, aes(x = iteration, y = value, group = name, color = name)) +
+  geom_line() + 
+  labs(color = NULL) + 
+  ylab(latex2exp::TeX("$\\beta$"))
+
+
+p
+```
+
+
+
+
+]
+
+.footnote[Example based on [this blog post](https://stephens999.github.io/fiveMinuteStats/MH-examples1.html).]
+
+---
+
+# Why is it bad?
+
+.pull-left[
+```{r, echo=FALSE, dev='svg', fig.height=6, fig.width=6, fig.align='center'}
+p
+```
+
+]
+.pull-right[
+
+```{r, echo=FALSE, dev='svg', fig.height=5.5, fig.width=4, fig.align='center'}
+ggplot(plot_df, aes(x = value)) + 
+  geom_histogram(bins = 30) + 
+  facet_wrap(vars(name), ncol = 1)
+```
+
+]
 
 
 ---
@@ -606,7 +766,7 @@ When re-generating 100 random datasets with same weight of mother, using the est
 
 # Posterior predictive check 2
 
-Logistic regression predicts the probability. Is the a relationship between the predicted probability and the error rate?
+Logistic regression predicts the probability. Is there a relationship between the predicted probability and the error rate?
 
 <center>
 <img src="figures/pp_error_binned_example.png" height="400">
@@ -704,6 +864,17 @@ Bayesian twists here as well:
 ```
 
 ---
+
+# Next step?
+
+- We have taken a lot of steps, but now are confident that our models work well for these data.
+
+- We can now look into the posterior distributions to actually answer our analysis questions. 
+
+- We'll do this with R code after the break.
+
+---
+
 
 class: center, middle
 
