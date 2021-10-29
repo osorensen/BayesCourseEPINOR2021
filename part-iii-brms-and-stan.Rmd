@@ -145,7 +145,7 @@ mod <- brm(Low ~ LWT, data = dat, family = bernoulli())
 # Fitting a logistic regression model with brms
 
 
-```{r, eval=TRUE}
+```{r, eval=FALSE}
 mod <- brm(Low ~ LWT, data = dat, family = bernoulli())
 ```
 
@@ -160,6 +160,16 @@ mod_glm <- glm(Low ~ LWT, data = dat, family = binomial())
 ---
 
 # Model output
+
+```{r, echo=FALSE, eval=FALSE}
+mod <- brm(Low ~ LWT, data = dat, family = bernoulli())
+saveRDS(mod, "data/mod.rds")
+```
+
+```{r, echo=FALSE}
+mod <- readRDS("data/mod.rds")
+```
+
 
 ```{r}
 summary(mod)
@@ -219,9 +229,136 @@ print(prior, show_df = FALSE)
 
 Then we have to fit the model first, with our preferred prior:
 
-```{r, eval=TRUE}
+```{r, eval=FALSE}
 mod <- brm(Low ~ LWT, data = dat, family = bernoulli(),
            prior = prior)
+```
+
+
+```{r, eval=FALSE, echo=FALSE}
+mod <- brm(Low ~ LWT, data = dat, family = bernoulli(),
+           prior = prior)
+saveRDS(mod, "data/mod_prior.rds")
+```
+
+```{r, echo=FALSE}
+mod <- readRDS("data/mod_prior.rds")
+```
+
+
+```
+## Compiling Stan program...
+```
+
+```
+## recompiling to avoid crashing R session
+```
+
+```
+## Start sampling
+```
+
+```
+## 
+## SAMPLING FOR MODEL 'f53afefa5fd92239adec95c91ede857a' NOW (CHAIN 1).
+## Chain 1: 
+## Chain 1: Gradient evaluation took 2.2e-05 seconds
+## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.22 seconds.
+## Chain 1: Adjust your expectations accordingly!
+## Chain 1: 
+## Chain 1: 
+## Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 1: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 1: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 1: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 1: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 1: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 1: 
+## Chain 1:  Elapsed Time: 0.032954 seconds (Warm-up)
+## Chain 1:                0.025207 seconds (Sampling)
+## Chain 1:                0.058161 seconds (Total)
+## Chain 1: 
+## 
+## SAMPLING FOR MODEL 'f53afefa5fd92239adec95c91ede857a' NOW (CHAIN 2).
+## Chain 2: 
+## Chain 2: Gradient evaluation took 1.2e-05 seconds
+## Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.12 seconds.
+## Chain 2: Adjust your expectations accordingly!
+## Chain 2: 
+## Chain 2: 
+## Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 2: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 2: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 2: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 2: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 2: 
+## Chain 2:  Elapsed Time: 0.032529 seconds (Warm-up)
+## Chain 2:                0.029446 seconds (Sampling)
+## Chain 2:                0.061975 seconds (Total)
+## Chain 2: 
+## 
+## SAMPLING FOR MODEL 'f53afefa5fd92239adec95c91ede857a' NOW (CHAIN 3).
+## Chain 3: 
+## Chain 3: Gradient evaluation took 1.1e-05 seconds
+## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.11 seconds.
+## Chain 3: Adjust your expectations accordingly!
+## Chain 3: 
+## Chain 3: 
+## Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 3: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 3: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 3: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 3: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 3: 
+## Chain 3:  Elapsed Time: 0.037319 seconds (Warm-up)
+## Chain 3:                0.02989 seconds (Sampling)
+## Chain 3:                0.067209 seconds (Total)
+## Chain 3: 
+## 
+## SAMPLING FOR MODEL 'f53afefa5fd92239adec95c91ede857a' NOW (CHAIN 4).
+## Chain 4: 
+## Chain 4: Gradient evaluation took 1.1e-05 seconds
+## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.11 seconds.
+## Chain 4: Adjust your expectations accordingly!
+## Chain 4: 
+## Chain 4: 
+## Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)
+## Chain 4: Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Chain 4: Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Chain 4: Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Chain 4: Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Chain 4: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Chain 4: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Chain 4: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Chain 4: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
+## Chain 4: 
+## Chain 4:  Elapsed Time: 0.031868 seconds (Warm-up)
+## Chain 4:                0.030694 seconds (Sampling)
+## Chain 4:                0.062562 seconds (Total)
+## Chain 4:
 ```
 
 
@@ -290,7 +427,7 @@ pp_check(mod, ndraws = 100, type = "bars")
 
 Extend the model by adding smoking status
 
-```{r}
+```{r, eval=FALSE}
 mod2 <- brm(
   Low ~ LWT + Smoker, data = dat, 
   family = bernoulli(),
@@ -300,6 +437,14 @@ mod2 <- brm(
   ))
 ```
 
+
+```{r, echo=FALSE, eval=FALSE}
+saveRDS(mod2, "data/mod2.rds")
+```
+
+```{r, echo=FALSE}
+mod2 <- readRDS("data/mod2.rds")
+```
 
 ---
 
@@ -381,9 +526,41 @@ head(df)
 
 # Joint Posterior Density
 
+Let's do this carefully. First select columns.
+
 ```{r}
 df %>% 
-  summarise(prob = mean(b_LWT > 0 & b_SmokerTRUE < 0))
+  as_tibble() %>% 
+ select(b_LWT, b_SmokerTRUE)
+```
+
+
+---
+
+# Joint Posterior Density
+
+Label the ones that meet our criteria.
+
+```{r}
+df %>% 
+  as_tibble() %>% 
+  select(b_LWT, b_SmokerTRUE) %>% 
+  mutate(meets_criteria = b_LWT > 0 & b_SmokerTRUE < 0)
+```
+
+
+---
+
+# Joint Posterior Density
+
+Find the proportion of samples from posterior distribution that meets the criteria.
+
+```{r}
+df %>% 
+  as_tibble() %>% 
+  select(b_LWT, b_SmokerTRUE) %>% 
+  mutate(meets_criteria = b_LWT > 0 & b_SmokerTRUE < 0) %>% 
+  summarise(proportion = mean(meets_criteria))
 ```
 
 ---
@@ -394,14 +571,31 @@ What's the probability that the odds ratio associated with a 1 kg difference in 
 
 ```{r}
 df %>% 
+  as_tibble() %>% 
+  select(b_LWT) %>% 
   mutate(
-    OR = exp(b_LWT),
-    in_range = between(OR, .99, 1.01)
-    ) %>% 
-  summarise(prob = mean(in_range))
+    odds_ratio = exp(b_LWT),
+    meets_criteria = between(odds_ratio, .99, 1.01))
 ```
 
 
+---
+
+# Joint Posterior Density
+
+Find proportion that meets criteria
+
+```{r}
+df %>% 
+  as_tibble() %>% 
+  select(b_LWT) %>% 
+  mutate(
+    odds_ratio = exp(b_LWT),
+    meets_criteria = between(odds_ratio, .99, 1.01)) %>% 
+  summarise(proportion = mean(meets_criteria))
+```
+
+This is the posterior probability that the odds ratio is between 0.99 and 1.01.
 
 ---
 

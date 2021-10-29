@@ -1,6 +1,4 @@
 base
-Rcpp
-brms
 tidyverse
 ggplot2
 tibble
@@ -10,7 +8,5 @@ purrr
 dplyr
 stringr
 forcats
-glue
-broom
-patchwork
-latex2exp
+Rcpp
+brms
