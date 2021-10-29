@@ -597,6 +597,76 @@ df %>%
 
 This is the posterior probability that the odds ratio is between 0.99 and 1.01.
 
+
+---
+
+# Bayes Factors
+
+
+
+---
+
+# Bayes Factors
+
+<center>
+<img src="figures/edu_brain.jpg" height=400>
+</center>
+
+.footnote[Nyberg, Lars, Fredrik Magnussen, Anders Lundquist, William Baaré, David Bartrés-Faz, Lars Bertram, C. J. Boraxbekk, et al. “Educational Attainment Does Not Influence Brain Aging.” Proceedings of the National Academy of Sciences 118, no. 18 (May 4, 2021). https://doi.org/10.1073/pnas.2101644118.]
+
+---
+
+class: inverse, middle, center
+
+# Was all of this worth the effort?
+
+---
+
+# Bayesian Models can Easily be Extended
+
+Next slides give some examples.
+
+---
+
+# Covariate measurement error
+
+Linear regression model. 
+
+$$y = \beta_{0} + x \beta + \epsilon$$
+
+$x$ is measured with error, so we don't see it. Instead we have $w$, defined by
+
+$$w = x + \delta$$
+
+This is a straightforward extension in the Bayesian setting.
+
+
+---
+
+# Missing Data
+
+Treat missing data as parameters and sample them within the Metropolis-Hastings algorithm.
+
+
+---
+
+# Hierarchical Models
+
+- Longitudinal designs with repeated measurements
+
+- Other grouping structures (students nested in classes nested in schools)
+
+
+---
+
+# Philosophical Issues
+
+
+
+---
+
+
+
 ---
 
 class: center, middle
