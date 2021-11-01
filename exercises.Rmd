@@ -119,7 +119,7 @@ Hint: type `help("plot.brmsfit")` in the R console and take a look at the `varia
 
 **e.** Look at the summary, `summary(mod)`. What is the effective sample size, and what does this mean?
 
-**f.** Check out ShinyStan, which gives you all the information you need via a graphical interface. If you don't have shinystan, start with `install.packages("shinystan")`.
+**f.** Check out ShinyStan, which gives you all the information you need via a graphical interface. If you don't have ShinyStan, start with `install.packages("shinystan")`.
 
 ```{r}
 library(shinystan)
