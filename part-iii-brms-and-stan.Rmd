@@ -626,6 +626,8 @@ class: inverse, middle, center
 
 Next slides give some examples.
 
+
+
 ---
 
 # Covariate measurement error
@@ -655,6 +657,13 @@ Treat missing data as parameters and sample them within the Metropolis-Hastings 
 - Longitudinal designs with repeated measurements
 
 - Other grouping structures (students nested in classes nested in schools)
+
+
+---
+
+# Highly unbalanced data
+
+
 
 
 ---
