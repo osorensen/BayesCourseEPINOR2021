@@ -817,7 +817,20 @@ This is the posterior probability that the odds ratio is between 0.99 and 1.01.
 
 # Bayes Factors
 
+- A Bayesian alternative to hypothesis testing: compare the posterior probabilities of two models.
 
+
+```r
+bayes_factor(mod, mod2)
+```
+
+- But Bayes factors work both ways.
+
+  - High posterior probability of `mod` means effect of `Smoker` is close to zero.
+  
+  - High posterior probability of `mod2` means effect of `Smoker` is not zero.
+  
+- Practical use of Bayes factors often criticized by statistics. In particular, the answers may be very sensitive to the choice of priors.
 
 ---
 
@@ -831,6 +844,21 @@ This is the posterior probability that the odds ratio is between 0.99 and 1.01.
 .footnote[Nyberg, Lars, Fredrik Magnussen, Anders Lundquist, William Baaré, David Bartrés-Faz, Lars Bertram, C. J. Boraxbekk, et al. “Educational Attainment Does Not Influence Brain Aging.” Proceedings of the National Academy of Sciences 118, no. 18 (May 4, 2021). https://doi.org/10.1073/pnas.2101644118.]
 
 ---
+
+# Bayes Factors - Proving the null
+
+From the Nyberg et al. paper:
+
+&gt; The informative prior assigned a very large prior probability that the effect of interest was close to zero (SD = 0.5 mm3/y). The obtained BF01 = 1.29 implies that the posterior probability is even more concentrated around zero than the informative prior, thus favoring the null hypothesis.
+
+
+Table for recommended interpretation following Jeffreys (1961) [can be found on Wikipedia](https://en.wikipedia.org/wiki/Bayes_factor).
+
+
+.footnote[Jeffreys, Harold (1998) [1961]. The Theory of Probability (3rd ed.). Oxford, England. p. 432. ISBN 9780191589676.]
+
+---
+
 
 class: inverse, middle, center
 
@@ -911,7 +939,7 @@ mod &lt;- brm(
 .pull-right[
 
 
-&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-43-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-44-1.png" style="display: block; margin: auto;" /&gt;
 
 
 ]
@@ -923,8 +951,19 @@ mod &lt;- brm(
 
 # Philosophical Issues
 
+- Statistical methods and analysis workflows relate the philosophy of science.
 
+- Frequentist methods associated with *deductive inference*, and if practiced correctly, ensure long-term error control at the `\(\alpha\)` level.
 
+- Bayesian methods have been identified as *inductive inference*. However, Gelman and Shalizi (2013) argue that Bayesian inference as it is used by practitioners, is *deductive inference*.
+
+- If interested in these issues, see Mayo (2018) for an impressive book.
+
+.footnote[
+Gelman, Andrew, and Cosma Rohilla Shalizi. “Philosophy and the Practice of Bayesian Statistics.” British Journal of Mathematical and Statistical Psychology 66, no. 1 (2013): 8–38. https://doi.org/10.1111/j.2044-8317.2011.02037.x.
+
+Mayo, Deborah G. Statistical Inference as Severe Testing: How to Get Beyond the Statistics Wars. 1st ed. Cambridge, UK: Cambridge University Press, 2018.
+]
 
 ---
 
