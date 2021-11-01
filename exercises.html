@@ -307,15 +307,18 @@ prior_limits_odds_ratio &lt;- exp(prior_quantiles_beta)</code></pre>
 <p><strong>d.</strong> Run <code>plot(mod)</code> and take a look at what comes out. Are you able to make a plot which does not contain the intercept?</p>
 <p>Hint: type <code>help(&quot;plot.brmsfit&quot;)</code> in the R console and take a look at the <code>variable</code> argument.</p>
 <p><strong>e.</strong> Look at the summary, <code>summary(mod)</code>. What is the effective sample size, and what does this mean?</p>
+<p><strong>f.</strong> Check out ShinyStan, which gives you all the information you need via a graphical interface. If you don’t have shinystan, start with <code>install.packages(&quot;shinystan&quot;)</code>.</p>
+<pre class="r"><code>library(shinystan)
+launch_shinystan(mod)</code></pre>
 </div>
 <div id="posterior-predictive-checks" class="section level2">
 <h2>Posterior predictive checks</h2>
-<p><strong>f.</strong> Type <code>help(&quot;pp_check&quot;)</code> in the R console and take a look at the examples which that you find at the bottom. Try to run some of them, and interpret the plots that come out. Are there some options which don’t make sense for a logistic regression model, but that would make sense, say, for a linear regression model?</p>
-<p><strong>g.</strong> The plots shown in <a href="part-iii-brms-and-stan.html">the lectures</a> were for a model that did not include smoking status. Can you reproduce one of the plots and see if they indicate similar effects?</p>
+<p><strong>g.</strong> Type <code>help(&quot;pp_check&quot;)</code> in the R console and take a look at the examples which that you find at the bottom. Try to run some of them, and interpret the plots that come out. Are there some options which don’t make sense for a logistic regression model, but that would make sense, say, for a linear regression model?</p>
+<p><strong>h.</strong> The plots shown in <a href="part-iii-brms-and-stan.html">the lectures</a> were for a model that did not include smoking status. Can you reproduce one of the plots and see if they indicate similar effects?</p>
 </div>
 <div id="compare-to-other-more-or-less-complicated-models" class="section level2">
 <h2>Compare to other more or less complicated models</h2>
-<p><strong>h.</strong> Check if the mother’s age is of relevance. You can include it in a new model as follows, where we use the default prior for the effect of age.</p>
+<p><strong>i.</strong> Check if the mother’s age is of relevance. You can include it in a new model as follows, where we use the default prior for the effect of age.</p>
 <pre class="r"><code>mod_age &lt;- brm(
   Low ~ LWT + Smoker + Age, data = dat, 
   family = bernoulli(),
@@ -325,12 +328,12 @@ prior_limits_odds_ratio &lt;- exp(prior_quantiles_beta)</code></pre>
     set_prior(prior = &quot;normal(0, 2)&quot;, class = &quot;b&quot;, 
               coef = &quot;SmokerTRUE&quot;)
   ))</code></pre>
-<p><strong>i.</strong> Ideally we should check computations for this model to, but for the sake of getting somewhere, let’s assume that was fine, and try to compare the model with age to the model without age, using leave-one-out cross-validation. What do you find?</p>
+<p><strong>j.</strong> Ideally we should check computations for this model to, but for the sake of getting somewhere, let’s assume that was fine, and try to compare the model with age to the model without age, using leave-one-out cross-validation. What do you find?</p>
 <p>Hint: You first need to compute the leave-one-out criterion for each model separately, like <code>loo1 &lt;- loo(mod)</code> and <code>loo2 &lt;- loo(mod_age)</code>. Then use the <code>loo_compare</code> function as shown in the lecturs.</p>
 </div>
 <div id="examine-the-model-estimates" class="section level2">
 <h2>Examine the model estimates</h2>
-<p><strong>j.</strong> Visualize the effects of the variables in your model on the risk of low birthweight. Start by looking at conditional effects, using the <code>conditional_effects</code> function. You can begin with running <code>conditional_effects(mod)</code> and explain what you see. Then read the documentation in <code>help(&quot;conditional_effects&quot;)</code> and see if you can plot something more interesting.</p>
+<p><strong>k.</strong> Visualize the effects of the variables in your model on the risk of low birthweight. Start by looking at conditional effects, using the <code>conditional_effects</code> function. You can begin with running <code>conditional_effects(mod)</code> and explain what you see. Then read the documentation in <code>help(&quot;conditional_effects&quot;)</code> and see if you can plot something more interesting.</p>
 </div>
 </div>
 <div id="exercise-3---explore-more" class="section level1">

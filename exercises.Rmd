@@ -110,6 +110,7 @@ mod <- brm(
 
 Having fitted the model, we need to confirm that computations worked satisfactorily. You probably got a hint in the long output from the last code chunk, but you can get more visual information from the `plot` function for `brms` models.
 
+
 **c.** Run `prior_summary(mod)` and see if your prior distribution has been correctly encoded.
 
 **d.** Run `plot(mod)` and take a look at what comes out. Are you able to make a plot which does not contain the intercept? 
@@ -118,16 +119,24 @@ Hint: type `help("plot.brmsfit")` in the R console and take a look at the `varia
 
 **e.** Look at the summary, `summary(mod)`. What is the effective sample size, and what does this mean?
 
+**f.** Check out ShinyStan, which gives you all the information you need via a graphical interface. If you don't have shinystan, start with `install.packages("shinystan")`.
+
+```{r}
+library(shinystan)
+launch_shinystan(mod)
+```
+
+
 
 ## Posterior predictive checks
 
-**f.** Type `help("pp_check")` in the R console and take a look at the examples which that you find at the bottom. Try to run some of them, and interpret the plots that come out. Are there some options which don't make sense for a logistic regression model, but that would make sense, say, for a linear regression model?
+**g.** Type `help("pp_check")` in the R console and take a look at the examples which that you find at the bottom. Try to run some of them, and interpret the plots that come out. Are there some options which don't make sense for a logistic regression model, but that would make sense, say, for a linear regression model?
 
-**g.** The plots shown in [the lectures](part-iii-brms-and-stan.html) were for a model that did not include smoking status. Can you reproduce one of the plots and see if they indicate similar effects?
+**h.** The plots shown in [the lectures](part-iii-brms-and-stan.html) were for a model that did not include smoking status. Can you reproduce one of the plots and see if they indicate similar effects?
 
 ## Compare to other more or less complicated models
 
-**h.** Check if the mother's age is of relevance. You can include it in a new model as follows, where we use the default prior for the effect of age.
+**i.** Check if the mother's age is of relevance. You can include it in a new model as follows, where we use the default prior for the effect of age.
 
 ```{r}
 mod_age <- brm(
@@ -141,13 +150,13 @@ mod_age <- brm(
   ))
 ```
 
-**i.** Ideally we should check computations for this model to, but for the sake of getting somewhere, let's assume that was fine, and try to compare the model with age to the model without age, using leave-one-out cross-validation. What do you find?
+**j.** Ideally we should check computations for this model to, but for the sake of getting somewhere, let's assume that was fine, and try to compare the model with age to the model without age, using leave-one-out cross-validation. What do you find?
 
 Hint: You first need to compute the leave-one-out criterion for each model separately, like `loo1 <- loo(mod)` and `loo2 <- loo(mod_age)`. Then use the `loo_compare` function as shown in the lecturs.
 
 ## Examine the model estimates
 
-**j.** Visualize the effects of the variables in your model on the risk of low birthweight. Start by looking at conditional effects, using the `conditional_effects` function. You can begin with running `conditional_effects(mod)` and explain what you see. Then read the documentation in `help("conditional_effects")` and see if you can plot something more interesting.
+**k.** Visualize the effects of the variables in your model on the risk of low birthweight. Start by looking at conditional effects, using the `conditional_effects` function. You can begin with running `conditional_effects(mod)` and explain what you see. Then read the documentation in `help("conditional_effects")` and see if you can plot something more interesting.
 
 
 # Exercise 3 - Explore more
