@@ -19,13 +19,12 @@ The tentative plan for the day is as follows. Click on the links to see the pres
 
 | Time | What |
 | --- | --- |
-| 10:00 - 11:30 | [Part I - Introduction to Bayesian Statistics](https://osorensen.github.io/BayesCourseEPINOR2021/part-i-introduction.html) |
+| 10:00 - 11:30 | [Part I - Introduction to Bayesian Statistics](part-i-introduction.html) |
 | 11:30 - 12:30 | Lunch |
 | 12:30 - 14:00 | [Part II - Bayesian Workflow for Data Analysis](part-ii-workflow.html) |
-| 14:15 - 15:15 | Part III - Bayesian Analysis with R |
+| 14:15 - 15:15 | [Part III - Bayesian Analysis with R](part-iii-brms-and-stan.html) |
 | 15:30 - 17:00 | Exercises with "brms" in R |
 
-The course material is not quite ready yet, but below are some instructions for those who want to have the 'brms' packages properly installed before we start.
 
 # Setup
 
