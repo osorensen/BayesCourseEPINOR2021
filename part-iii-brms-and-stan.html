@@ -31,7 +31,7 @@ class: center, middle, inverse, title-slide
 
 - An overview of tools for Bayesian analysis in R
 
-- Stan, brms
+- The 'brms' package: probably the best place to start
 
 - 15 minute break
 
@@ -41,7 +41,30 @@ class: center, middle, inverse, title-slide
 
 # Fitting Bayesian Models
 
-- Computation for Bayesian models requires more expertise than fitting frequentist models.
+.pull-left[
+- Computation for Bayesian models requires more expertise than fitting frequentist models. 
+
+- Series of papers by Greenland written 10-15 years ago contain lots of tricks for approximately fitting Bayesian models using familiar software.
+
+- In contrast, fairly complex mixed models can be estimated with a single line of code or the press of a button, e.g., mixed models, Cox regression.
+
+]
+.pull-right[
+
+&lt;img src="figures/greenland1.jpg" width=400&gt;
+
+&lt;img src="figures/greenland2.jpg" width=400&gt;
+
+&lt;img src="figures/greenland3.jpg" width=400&gt;
+]
+
+---
+
+# Software for Fitting Bayesian Models
+
+- Several attempts at making this process easier.
+
+--
 
 - [BUGS - Bayesian Inference Using Gibbs Sampling](https://www.mrc-bsu.cam.ac.uk/software/bugs/)
   
@@ -53,7 +76,7 @@ class: center, middle, inverse, title-slide
   
 - [Stan](https://mc-stan.org/)
 
-  - State-of-the-art tool for Bayesian computation.
+  - State-of-the-art tool for Bayesian computation, developed mainly at Columbia University.
   
   - Very active community.
 
@@ -98,27 +121,9 @@ class: center, middle, inverse, title-slide
 library(brms)
 ```
 
-```
-## Loading required package: Rcpp
-```
-
-```
-## Loading 'brms' package (version 2.16.1). Useful instructions
-## can be found by typing help('brms'). A more detailed introduction
-## to the package is available through vignette('brms_overview').
-```
-
-```
-## 
-## Attaching package: 'brms'
-```
-
-```
-## The following object is masked from 'package:stats':
-## 
-##     ar
-```
-
+&lt;center&gt;
+&lt;img src="figures/brms_paper.jpg" width=400&gt;
+&lt;/center&gt;
 
 .footnote[
 Bürkner, Paul-Christian. “brms: An R Package for Bayesian Multilevel Models Using Stan.” Journal of Statistical Software 80, no. 1 (August 29, 2017): 1–28. https://doi.org/10.18637/jss.v080.i01.
@@ -154,6 +159,9 @@ head(dat)
 
 ```r
 mod &lt;- brm(Low ~ LWT, data = dat, family = bernoulli())
+```
+--
+```r
 ## Compiling Stan program...
 ## Start sampling
 ## 
@@ -174,6 +182,7 @@ mod &lt;- brm(Low ~ LWT, data = dat, family = bernoulli())
 ## Chain 4:                0.054892 seconds (Sampling)
 ## Chain 4:                0.113273 seconds (Total)
 ## Chain 4: 
+
 ```
 
 
@@ -240,6 +249,10 @@ class: inverse, middle, center
 
 - Important, but not particularly related to brms. 
 
+- But if you want to get good at data visualization in R, there are lots of good and free resources at https://ggplot2.tidyverse.org/
+
+- You'll also get some hands-on experience in the exercises.
+
 ---
 
 # (b) Prior Distribution
@@ -263,7 +276,7 @@ print(prior, show_df = FALSE)
 
 - "b" denotes all population-level parameters
 - "b_LWT" denotes the particular LWT parameter
-- "Intercept" is what it is.
+- "Intercept" is intercept...
 
 ---
 
@@ -308,20 +321,12 @@ mod &lt;- brm(Low ~ LWT, data = dat, family = bernoulli(),
 
 
 
+--
 
 ```
 ## Compiling Stan program...
-```
-
-```
 ## recompiling to avoid crashing R session
-```
-
-```
 ## Start sampling
-```
-
-```
 ## 
 ## SAMPLING FOR MODEL 'f53afefa5fd92239adec95c91ede857a' NOW (CHAIN 1).
 ## Chain 1: 
@@ -348,80 +353,6 @@ mod &lt;- brm(Low ~ LWT, data = dat, family = bernoulli(),
 ## Chain 1:                0.058161 seconds (Total)
 ## Chain 1: 
 ## 
-## SAMPLING FOR MODEL 'f53afefa5fd92239adec95c91ede857a' NOW (CHAIN 2).
-## Chain 2: 
-## Chain 2: Gradient evaluation took 1.2e-05 seconds
-## Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.12 seconds.
-## Chain 2: Adjust your expectations accordingly!
-## Chain 2: 
-## Chain 2: 
-## Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)
-## Chain 2: Iteration:  200 / 2000 [ 10%]  (Warmup)
-## Chain 2: Iteration:  400 / 2000 [ 20%]  (Warmup)
-## Chain 2: Iteration:  600 / 2000 [ 30%]  (Warmup)
-## Chain 2: Iteration:  800 / 2000 [ 40%]  (Warmup)
-## Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)
-## Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)
-## Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)
-## Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)
-## Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
-## Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
-## Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
-## Chain 2: 
-## Chain 2:  Elapsed Time: 0.032529 seconds (Warm-up)
-## Chain 2:                0.029446 seconds (Sampling)
-## Chain 2:                0.061975 seconds (Total)
-## Chain 2: 
-## 
-## SAMPLING FOR MODEL 'f53afefa5fd92239adec95c91ede857a' NOW (CHAIN 3).
-## Chain 3: 
-## Chain 3: Gradient evaluation took 1.1e-05 seconds
-## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.11 seconds.
-## Chain 3: Adjust your expectations accordingly!
-## Chain 3: 
-## Chain 3: 
-## Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)
-## Chain 3: Iteration:  200 / 2000 [ 10%]  (Warmup)
-## Chain 3: Iteration:  400 / 2000 [ 20%]  (Warmup)
-## Chain 3: Iteration:  600 / 2000 [ 30%]  (Warmup)
-## Chain 3: Iteration:  800 / 2000 [ 40%]  (Warmup)
-## Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)
-## Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)
-## Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)
-## Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)
-## Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
-## Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
-## Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
-## Chain 3: 
-## Chain 3:  Elapsed Time: 0.037319 seconds (Warm-up)
-## Chain 3:                0.02989 seconds (Sampling)
-## Chain 3:                0.067209 seconds (Total)
-## Chain 3: 
-## 
-## SAMPLING FOR MODEL 'f53afefa5fd92239adec95c91ede857a' NOW (CHAIN 4).
-## Chain 4: 
-## Chain 4: Gradient evaluation took 1.1e-05 seconds
-## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.11 seconds.
-## Chain 4: Adjust your expectations accordingly!
-## Chain 4: 
-## Chain 4: 
-## Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)
-## Chain 4: Iteration:  200 / 2000 [ 10%]  (Warmup)
-## Chain 4: Iteration:  400 / 2000 [ 20%]  (Warmup)
-## Chain 4: Iteration:  600 / 2000 [ 30%]  (Warmup)
-## Chain 4: Iteration:  800 / 2000 [ 40%]  (Warmup)
-## Chain 4: Iteration: 1000 / 2000 [ 50%]  (Warmup)
-## Chain 4: Iteration: 1001 / 2000 [ 50%]  (Sampling)
-## Chain 4: Iteration: 1200 / 2000 [ 60%]  (Sampling)
-## Chain 4: Iteration: 1400 / 2000 [ 70%]  (Sampling)
-## Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
-## Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
-## Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
-## Chain 4: 
-## Chain 4:  Elapsed Time: 0.031868 seconds (Warm-up)
-## Chain 4:                0.030694 seconds (Sampling)
-## Chain 4:                0.062562 seconds (Total)
-## Chain 4:
 ```
 
 
@@ -435,6 +366,9 @@ plot(mod)
 ```
 
 &lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-16-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+Most of the plotting functions in brms use the BayesPlot package, which has a [homepage with many nice examples of what can be done](https://mc-stan.org/bayesplot/).
 
 ---
 
@@ -478,7 +412,7 @@ summary(mod)
 
 ---
 
-# (d) Check that the model fits the data well
+# (d) Posterior predictive checks
 
 
 ```r
@@ -491,24 +425,60 @@ pp_check(mod)
 
 &lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-19-1.svg" style="display: block; margin: auto;" /&gt;
 
+A very fancy way of checking that the proportion of children with low birthweights is replicated by the model predictions.
+
 ---
 
-# (d) Check that the model fits the data well
+# (d) Posterior predictive checks
 
 
 ```r
-pp_check(mod, type = "error_hist", ndraws = 11)
-```
-
-```
-## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+pp_check(mod, ndraws = 100)
 ```
 
 &lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-20-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
-# (d) Check that the model fits the data well
+# (d) Error histograms
+
+
+```r
+pp_check(mod, type = "error_hist", ndraws = 12, binwidth = 1)
+```
+
+&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-21-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# (d) Error histograms
+
+
+.pull-left[
+
+- Low birthweight is coded as 1 and normal as 0.
+
+- The table shows what `\(y - y_{\text{rep}}\)` means:
+
+| `\(y - y_{\text{rep}}\)` | Predicted low bw `\(y_{\text{rep}}=1\)` | Predicted normal bw `\(y_{\text{rep}}=0\)` |
+| ---- | ---- | ---- |
+| Actual low bw `\(y=1\)` | 0 | 1 | 
+| Actual normal bw `\(y=0\)` | -1 | 0 | 
+
+]
+.pull-right[
+
+&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-22-1.svg" style="display: block; margin: auto;" /&gt;
+
+]
+
+
+---
+
+# (d) Scatter plot
+
+True value on y-axis, average prediction on x-axis.
 
 
 ```r
@@ -519,19 +489,20 @@ pp_check(mod, type = "scatter_avg")
 ## Using all posterior draws for ppc type 'scatter_avg' by default.
 ```
 
-&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-21-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-23-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
-# (d) Check that the model fits the data well
+# (d) Bar plot
 
 
 ```r
 pp_check(mod, ndraws = 100, type = "bars")
 ```
 
-&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-22-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-24-1.svg" style="display: block; margin: auto;" /&gt;
 
+True data in light blue, predictions from repeated sampling from the model overlayed.
 
 ---
 
@@ -541,40 +512,58 @@ Extend the model by adding smoking status
 
 
 ```r
-mod2 &lt;- brm(
-  Low ~ LWT + Smoker, data = dat, 
-  family = bernoulli(),
-  prior = c(
-    set_prior("normal(0, 0.4)", "b", coef = "LWT"),
-    set_prior("normal(0, 2)", "b", coef = "SmokerTRUE")
-  ))
+mod2 &lt;- brm(Low ~ LWT + Smoker, data = dat, 
+            family = bernoulli())
 ```
-
-
-
-
 
 
 ---
 
 # (e) Compare to other more or less complicated models
 
+We need priors!
+
+
+```r
+mod2 &lt;- brm(
+  Low ~ LWT + Smoker, data = dat, 
+  family = bernoulli(),
+  prior = c(
+    set_prior(prior = "normal(0, 0.4)", class = "b", 
+              coef = "LWT"),
+    set_prior(prior = "normal(0, 2)", class = "b", 
+              coef = "SmokerTRUE")
+  ))
+```
+
+- Let's stick to this prior for smoking now. You will look further at it in the exercises.
+
+
+
+
+
+---
+
+# (e) Model with smoking
+
 
 ```r
 plot(mod2)
 ```
 
-&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-26-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-29-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ---
 
-# (e) Leave-one-out Cross-validation
+# (e) Compare by leave-one-out cross-validation
 
 
 ```r
 loo1 &lt;- loo(mod, model_names = "LWT")
+
 loo2 &lt;- loo(mod2, model_names = "LWT+Smoker")
+
 loo_compare(loo1, loo2)
 ```
 
@@ -584,6 +573,14 @@ loo_compare(loo1, loo2)
 ## LWT        -1.1       2.1
 ```
 
+- Model without smoking yields worse fit, but not "significantly". 
+
+  - How can we tell?
+
+
+--
+
+- We keep both, and analyse their estimates.
 
 ---
 
@@ -594,7 +591,7 @@ loo_compare(loo1, loo2)
 conditional_effects(mod)
 ```
 
-&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-28-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-31-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -608,7 +605,7 @@ conditional_effects(
                           cond__ = c("Non-smoker", "Smoker")))
 ```
 
-&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-29-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-32-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -619,7 +616,7 @@ conditional_effects(
 mcmc_plot(mod2)
 ```
 
-&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-30-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-33-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -631,7 +628,7 @@ mcmc_plot(mod2, variable = c("b_LWT", "b_SmokerTRUE"),
           type = "scatter")
 ```
 
-&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-31-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-34-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -642,7 +639,7 @@ mcmc_plot(mod2, variable = c("b_LWT", "b_SmokerTRUE"),
 mcmc_plot(mod2, type = "pairs")
 ```
 
-&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-32-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-35-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -679,7 +676,7 @@ Let's do this carefully. First select columns.
 ```r
 df %&gt;% 
   as_tibble() %&gt;% 
- select(b_LWT, b_SmokerTRUE)
+  select(b_LWT, b_SmokerTRUE)
 ```
 
 ```
@@ -801,7 +798,8 @@ df %&gt;%
   select(b_LWT) %&gt;% 
   mutate(
     odds_ratio = exp(b_LWT),
-    meets_criteria = between(odds_ratio, .99, 1.01)) %&gt;% 
+    meets_criteria = between(odds_ratio, .99, 1.01)
+    ) %&gt;% 
   summarise(proportion = mean(meets_criteria))
 ```
 
@@ -823,10 +821,11 @@ This is the posterior probability that the odds ratio is between 0.99 and 1.01.
 
 ---
 
-# Bayes Factors
+# Bayes Factors - Proving the null
 
 &lt;center&gt;
-&lt;img src="figures/edu_brain.jpg" height=400&gt;
+&lt;img src="figures/nyberg_edu.jpg" width=500&gt;
+&lt;img src="figures/edu_brain.jpg" height=300&gt;
 &lt;/center&gt;
 
 .footnote[Nyberg, Lars, Fredrik Magnussen, Anders Lundquist, William Baaré, David Bartrés-Faz, Lars Bertram, C. J. Boraxbekk, et al. “Educational Attainment Does Not Influence Brain Aging.” Proceedings of the National Academy of Sciences 118, no. 18 (May 4, 2021). https://doi.org/10.1073/pnas.2101644118.]
@@ -839,9 +838,9 @@ class: inverse, middle, center
 
 ---
 
-# Bayesian Models can Easily be Extended
+# Was all of this worth the effort?
 
-Next slides give some examples.
+Maybe not in this particular case, but Bayesian models can easily be extended.
 
 
 
@@ -849,7 +848,8 @@ Next slides give some examples.
 
 # Covariate measurement error
 
-Linear regression model. 
+.pull-left[
+Regression model. 
 
 `$$y = \beta_{0} + x \beta + \epsilon$$`
 
@@ -857,14 +857,30 @@ Linear regression model.
 
 `$$w = x + \delta$$`
 
-This is a straightforward extension in the Bayesian setting.
+(Measured = True + Noise)
+
+Using measurements `\(w\)` lead to bias in `\(\beta\)`. Quite straightforward to take into account in Bayesian models.
+
+- Treat true value `\(x\)` as an unknown parameter, just like `\(\beta\)`. Sample it from the posterior.
+]
+
+.pull-right[
+
+&lt;img src="figures/bp_measure.webp"&gt;
+
+]
+
 
 
 ---
 
 # Missing Data
 
-Treat missing data as parameters and sample them within the Metropolis-Hastings algorithm.
+What if data are missing?
+
+Treat the missing data as parameters. Sample them from posterior together with all other parameters.
+
+See, e.g., [the mice package](https://CRAN.R-project.org/package=mice).
 
 
 ---
@@ -875,10 +891,30 @@ Treat missing data as parameters and sample them within the Metropolis-Hastings 
 
 - Other grouping structures (students nested in classes nested in schools)
 
+.pull-left[
+Example in brms. Linear mixed model with random slopes.
 
----
 
-# Highly unbalanced data
+```r
+mod &lt;- brm(
+  y ~ age + (age | id), 
+  data = dat)
+```
+
+
+- Can study level-slope correlation: Do people who start out high grow faster or slower?
+
+
+
+]
+
+.pull-right[
+
+
+&lt;img src="part-iii-brms-and-stan_files/figure-html/unnamed-chunk-43-1.png" style="display: block; margin: auto;" /&gt;
+
+
+]
 
 
 
@@ -887,9 +923,6 @@ Treat missing data as parameters and sample them within the Metropolis-Hastings 
 
 # Philosophical Issues
 
-
-
----
 
 
 

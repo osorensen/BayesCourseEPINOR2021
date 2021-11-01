@@ -29,7 +29,7 @@ theme_set(theme_bw())
 
 - An overview of tools for Bayesian analysis in R
 
-- Stan, brms
+- The 'brms' package: probably the best place to start
 
 - 15 minute break
 
@@ -39,7 +39,30 @@ theme_set(theme_bw())
 
 # Fitting Bayesian Models
 
-- Computation for Bayesian models requires more expertise than fitting frequentist models.
+.pull-left[
+- Computation for Bayesian models requires more expertise than fitting frequentist models. 
+
+- Series of papers by Greenland written 10-15 years ago contain lots of tricks for approximately fitting Bayesian models using familiar software.
+
+- In contrast, fairly complex mixed models can be estimated with a single line of code or the press of a button, e.g., mixed models, Cox regression.
+
+]
+.pull-right[
+
+<img src="figures/greenland1.jpg" width=400>
+
+<img src="figures/greenland2.jpg" width=400>
+
+<img src="figures/greenland3.jpg" width=400>
+]
+
+---
+
+# Software for Fitting Bayesian Models
+
+- Several attempts at making this process easier.
+
+--
 
 - [BUGS - Bayesian Inference Using Gibbs Sampling](https://www.mrc-bsu.cam.ac.uk/software/bugs/)
   
@@ -51,7 +74,7 @@ theme_set(theme_bw())
   
 - [Stan](https://mc-stan.org/)
 
-  - State-of-the-art tool for Bayesian computation.
+  - State-of-the-art tool for Bayesian computation, developed mainly at Columbia University.
   
   - Very active community.
 
@@ -91,10 +114,13 @@ theme_set(theme_bw())
 
 # brms
 
-```{r}
+```{r, message=FALSE}
 library(brms)
 ```
 
+<center>
+<img src="figures/brms_paper.jpg" width=400>
+</center>
 
 .footnote[
 Bürkner, Paul-Christian. “brms: An R Package for Bayesian Multilevel Models Using Stan.” Journal of Statistical Software 80, no. 1 (August 29, 2017): 1–28. https://doi.org/10.18637/jss.v080.i01.
@@ -117,6 +143,9 @@ head(dat)
 
 ```r
 mod <- brm(Low ~ LWT, data = dat, family = bernoulli())
+```
+--
+```r
 ## Compiling Stan program...
 ## Start sampling
 ## 
@@ -137,6 +166,7 @@ mod <- brm(Low ~ LWT, data = dat, family = bernoulli())
 ## Chain 4:                0.054892 seconds (Sampling)
 ## Chain 4:                0.113273 seconds (Total)
 ## Chain 4: 
+
 ```
 
 
@@ -187,6 +217,10 @@ class: inverse, middle, center
 
 - Important, but not particularly related to brms. 
 
+- But if you want to get good at data visualization in R, there are lots of good and free resources at https://ggplot2.tidyverse.org/
+
+- You'll also get some hands-on experience in the exercises.
+
 ---
 
 # (b) Prior Distribution
@@ -203,7 +237,7 @@ print(prior, show_df = FALSE)
 
 - "b" denotes all population-level parameters
 - "b_LWT" denotes the particular LWT parameter
-- "Intercept" is what it is.
+- "Intercept" is intercept...
 
 ---
 
@@ -245,20 +279,12 @@ saveRDS(mod, "data/mod_prior.rds")
 mod <- readRDS("data/mod_prior.rds")
 ```
 
+--
 
 ```
 ## Compiling Stan program...
-```
-
-```
 ## recompiling to avoid crashing R session
-```
-
-```
 ## Start sampling
-```
-
-```
 ## 
 ## SAMPLING FOR MODEL 'f53afefa5fd92239adec95c91ede857a' NOW (CHAIN 1).
 ## Chain 1: 
@@ -285,80 +311,6 @@ mod <- readRDS("data/mod_prior.rds")
 ## Chain 1:                0.058161 seconds (Total)
 ## Chain 1: 
 ## 
-## SAMPLING FOR MODEL 'f53afefa5fd92239adec95c91ede857a' NOW (CHAIN 2).
-## Chain 2: 
-## Chain 2: Gradient evaluation took 1.2e-05 seconds
-## Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.12 seconds.
-## Chain 2: Adjust your expectations accordingly!
-## Chain 2: 
-## Chain 2: 
-## Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)
-## Chain 2: Iteration:  200 / 2000 [ 10%]  (Warmup)
-## Chain 2: Iteration:  400 / 2000 [ 20%]  (Warmup)
-## Chain 2: Iteration:  600 / 2000 [ 30%]  (Warmup)
-## Chain 2: Iteration:  800 / 2000 [ 40%]  (Warmup)
-## Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)
-## Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)
-## Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)
-## Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)
-## Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
-## Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
-## Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
-## Chain 2: 
-## Chain 2:  Elapsed Time: 0.032529 seconds (Warm-up)
-## Chain 2:                0.029446 seconds (Sampling)
-## Chain 2:                0.061975 seconds (Total)
-## Chain 2: 
-## 
-## SAMPLING FOR MODEL 'f53afefa5fd92239adec95c91ede857a' NOW (CHAIN 3).
-## Chain 3: 
-## Chain 3: Gradient evaluation took 1.1e-05 seconds
-## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.11 seconds.
-## Chain 3: Adjust your expectations accordingly!
-## Chain 3: 
-## Chain 3: 
-## Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)
-## Chain 3: Iteration:  200 / 2000 [ 10%]  (Warmup)
-## Chain 3: Iteration:  400 / 2000 [ 20%]  (Warmup)
-## Chain 3: Iteration:  600 / 2000 [ 30%]  (Warmup)
-## Chain 3: Iteration:  800 / 2000 [ 40%]  (Warmup)
-## Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)
-## Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)
-## Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)
-## Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)
-## Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
-## Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
-## Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
-## Chain 3: 
-## Chain 3:  Elapsed Time: 0.037319 seconds (Warm-up)
-## Chain 3:                0.02989 seconds (Sampling)
-## Chain 3:                0.067209 seconds (Total)
-## Chain 3: 
-## 
-## SAMPLING FOR MODEL 'f53afefa5fd92239adec95c91ede857a' NOW (CHAIN 4).
-## Chain 4: 
-## Chain 4: Gradient evaluation took 1.1e-05 seconds
-## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.11 seconds.
-## Chain 4: Adjust your expectations accordingly!
-## Chain 4: 
-## Chain 4: 
-## Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)
-## Chain 4: Iteration:  200 / 2000 [ 10%]  (Warmup)
-## Chain 4: Iteration:  400 / 2000 [ 20%]  (Warmup)
-## Chain 4: Iteration:  600 / 2000 [ 30%]  (Warmup)
-## Chain 4: Iteration:  800 / 2000 [ 40%]  (Warmup)
-## Chain 4: Iteration: 1000 / 2000 [ 50%]  (Warmup)
-## Chain 4: Iteration: 1001 / 2000 [ 50%]  (Sampling)
-## Chain 4: Iteration: 1200 / 2000 [ 60%]  (Sampling)
-## Chain 4: Iteration: 1400 / 2000 [ 70%]  (Sampling)
-## Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
-## Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
-## Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
-## Chain 4: 
-## Chain 4:  Elapsed Time: 0.031868 seconds (Warm-up)
-## Chain 4:                0.030694 seconds (Sampling)
-## Chain 4:                0.062562 seconds (Total)
-## Chain 4:
 ```
 
 
@@ -366,9 +318,12 @@ mod <- readRDS("data/mod_prior.rds")
 
 # (c) Check that computations work correctly
 
-```{r, eval=TRUE, dev='svg', fig.height=4}
+```{r, eval=TRUE, dev='svg', fig.height=3}
 plot(mod)
 ```
+
+
+Most of the plotting functions in brms use the BayesPlot package, which has a [homepage with many nice examples of what can be done](https://mc-stan.org/bayesplot/).
 
 ---
 
@@ -390,36 +345,76 @@ summary(mod)
 
 ---
 
-# (d) Check that the model fits the data well
+# (d) Posterior predictive checks
 
-```{r, eval=TRUE, dev='svg', fig.height=4}
+```{r, eval=TRUE, dev='svg', fig.height=3, fig.width=5}
 pp_check(mod)
 ```
 
+A very fancy way of checking that the proportion of children with low birthweights is replicated by the model predictions.
+
 ---
 
-# (d) Check that the model fits the data well
+# (d) Posterior predictive checks
 
 ```{r, eval=TRUE, dev='svg', fig.height=4}
-pp_check(mod, type = "error_hist", ndraws = 11)
+pp_check(mod, ndraws = 100)
 ```
 
 ---
 
-# (d) Check that the model fits the data well
+# (d) Error histograms
 
 ```{r, eval=TRUE, dev='svg', fig.height=4}
+pp_check(mod, type = "error_hist", ndraws = 12, binwidth = 1)
+```
+
+
+---
+
+# (d) Error histograms
+
+
+.pull-left[
+
+- Low birthweight is coded as 1 and normal as 0.
+
+- The table shows what $y - y_{\text{rep}}$ means:
+
+| $y - y_{\text{rep}}$ | Predicted low bw $y_{\text{rep}}=1$ | Predicted normal bw $y_{\text{rep}}=0$ |
+| ---- | ---- | ---- |
+| Actual low bw $y=1$ | 0 | 1 | 
+| Actual normal bw $y=0$ | -1 | 0 | 
+
+]
+.pull-right[
+
+```{r, eval=TRUE, dev='svg', echo=FALSE, fig.height=5, fig.width=4}
+pp_check(mod, type = "error_hist", ndraws = 4, binwidth = 1)
+```
+
+]
+
+
+---
+
+# (d) Scatter plot
+
+True value on y-axis, average prediction on x-axis.
+
+```{r, eval=TRUE, dev='svg', fig.height=3, fig.width=5}
 pp_check(mod, type = "scatter_avg")
 ```
 
 ---
 
-# (d) Check that the model fits the data well
+# (d) Bar plot
 
-```{r, eval=TRUE, dev='svg', fig.height=4}
+```{r, eval=TRUE, dev='svg', fig.height=3, fig.width=5}
 pp_check(mod, ndraws = 100, type = "bars")
 ```
 
+True data in light blue, predictions from repeated sampling from the model overlayed.
 
 ---
 
@@ -428,15 +423,30 @@ pp_check(mod, ndraws = 100, type = "bars")
 Extend the model by adding smoking status
 
 ```{r, eval=FALSE}
+mod2 <- brm(Low ~ LWT + Smoker, data = dat, 
+            family = bernoulli())
+```
+
+
+---
+
+# (e) Compare to other more or less complicated models
+
+We need priors!
+
+```{r, eval=FALSE}
 mod2 <- brm(
   Low ~ LWT + Smoker, data = dat, 
   family = bernoulli(),
   prior = c(
-    set_prior("normal(0, 0.4)", "b", coef = "LWT"),
-    set_prior("normal(0, 2)", "b", coef = "SmokerTRUE")
+    set_prior(prior = "normal(0, 0.4)", class = "b", 
+              coef = "LWT"),
+    set_prior(prior = "normal(0, 2)", class = "b", 
+              coef = "SmokerTRUE")
   ))
 ```
 
+- Let's stick to this prior for smoking now. You will look further at it in the exercises.
 
 ```{r, echo=FALSE, eval=FALSE}
 saveRDS(mod2, "data/mod2.rds")
@@ -448,7 +458,7 @@ mod2 <- readRDS("data/mod2.rds")
 
 ---
 
-# (e) Compare to other more or less complicated models
+# (e) Model with smoking
 
 ```{r, eval=TRUE, dev='svg', fig.height=4}
 plot(mod2)
@@ -457,20 +467,30 @@ plot(mod2)
 
 ---
 
-# (e) Leave-one-out Cross-validation
+# (e) Compare by leave-one-out cross-validation
 
 ```{r}
 loo1 <- loo(mod, model_names = "LWT")
+
 loo2 <- loo(mod2, model_names = "LWT+Smoker")
+
 loo_compare(loo1, loo2)
 ```
 
+- Model without smoking yields worse fit, but not "significantly". 
+
+  - How can we tell?
+
+
+--
+
+- We keep both, and analyse their estimates.
 
 ---
 
 # Examine the model outputs
 
-```{r}
+```{r, dev='svg', fig.height=4}
 conditional_effects(mod)
 ```
 
@@ -478,7 +498,7 @@ conditional_effects(mod)
 
 # Examine the model outputs
 
-```{r}
+```{r, dev='svg', fig.height=4}
 conditional_effects(
   mod2, effects = "LWT",
   conditions = data.frame(Smoker = c(FALSE, TRUE),
@@ -489,7 +509,7 @@ conditional_effects(
 
 # Posterior intervals
 
-```{r}
+```{r, dev='svg', fig.height=4}
 mcmc_plot(mod2)
 ```
 
@@ -531,7 +551,7 @@ Let's do this carefully. First select columns.
 ```{r}
 df %>% 
   as_tibble() %>% 
- select(b_LWT, b_SmokerTRUE)
+  select(b_LWT, b_SmokerTRUE)
 ```
 
 
@@ -591,7 +611,8 @@ df %>%
   select(b_LWT) %>% 
   mutate(
     odds_ratio = exp(b_LWT),
-    meets_criteria = between(odds_ratio, .99, 1.01)) %>% 
+    meets_criteria = between(odds_ratio, .99, 1.01)
+    ) %>% 
   summarise(proportion = mean(meets_criteria))
 ```
 
@@ -606,10 +627,11 @@ This is the posterior probability that the odds ratio is between 0.99 and 1.01.
 
 ---
 
-# Bayes Factors
+# Bayes Factors - Proving the null
 
 <center>
-<img src="figures/edu_brain.jpg" height=400>
+<img src="figures/nyberg_edu.jpg" width=500>
+<img src="figures/edu_brain.jpg" height=300>
 </center>
 
 .footnote[Nyberg, Lars, Fredrik Magnussen, Anders Lundquist, William Baaré, David Bartrés-Faz, Lars Bertram, C. J. Boraxbekk, et al. “Educational Attainment Does Not Influence Brain Aging.” Proceedings of the National Academy of Sciences 118, no. 18 (May 4, 2021). https://doi.org/10.1073/pnas.2101644118.]
@@ -622,9 +644,9 @@ class: inverse, middle, center
 
 ---
 
-# Bayesian Models can Easily be Extended
+# Was all of this worth the effort?
 
-Next slides give some examples.
+Maybe not in this particular case, but Bayesian models can easily be extended.
 
 
 
@@ -632,7 +654,8 @@ Next slides give some examples.
 
 # Covariate measurement error
 
-Linear regression model. 
+.pull-left[
+Regression model. 
 
 $$y = \beta_{0} + x \beta + \epsilon$$
 
@@ -640,14 +663,30 @@ $x$ is measured with error, so we don't see it. Instead we have $w$, defined by
 
 $$w = x + \delta$$
 
-This is a straightforward extension in the Bayesian setting.
+(Measured = True + Noise)
+
+Using measurements $w$ lead to bias in $\beta$. Quite straightforward to take into account in Bayesian models.
+
+- Treat true value $x$ as an unknown parameter, just like $\beta$. Sample it from the posterior.
+]
+
+.pull-right[
+
+<img src="figures/bp_measure.webp">
+
+]
+
 
 
 ---
 
 # Missing Data
 
-Treat missing data as parameters and sample them within the Metropolis-Hastings algorithm.
+What if data are missing?
+
+Treat the missing data as parameters. Sample them from posterior together with all other parameters.
+
+See, e.g., [the mice package](https://CRAN.R-project.org/package=mice).
 
 
 ---
@@ -658,10 +697,43 @@ Treat missing data as parameters and sample them within the Metropolis-Hastings 
 
 - Other grouping structures (students nested in classes nested in schools)
 
+.pull-left[
+Example in brms. Linear mixed model with random slopes.
 
----
+```{r, eval=FALSE}
+mod <- brm(
+  y ~ age + (age | id), 
+  data = dat)
+```
 
-# Highly unbalanced data
+
+- Can study level-slope correlation: Do people who start out high grow faster or slower?
+
+
+
+]
+
+.pull-right[
+
+
+```{r, echo=FALSE}
+n <- 100
+tibble(
+  id = 1:n,
+  tp = list(0:3),
+  b0 = rnorm(n),
+  b1 = rnorm(n, sd = .4)
+) %>% 
+  unnest(cols = tp) %>% 
+  mutate(
+    y = (1 + b1) * tp + b0 + rnorm(nrow(.))
+  ) %>% 
+  ggplot(aes(x = tp, y = y, group = id)) + 
+  geom_line()
+```
+
+
+]
 
 
 
@@ -670,9 +742,6 @@ Treat missing data as parameters and sample them within the Metropolis-Hastings 
 
 # Philosophical Issues
 
-
-
----
 
 
 
