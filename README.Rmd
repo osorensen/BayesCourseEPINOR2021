@@ -1,9 +1,6 @@
 ---
 title: "A Gentle Introduction to Bayesian Statistics"
 output: 
-  github_document:
-    fig_width: 6
-    fig_height: 4
   html_document:
     toc: true
     toc_float: true
@@ -23,7 +20,7 @@ The tentative plan for the day is as follows. Click on the links to see the pres
 | 11:30 - 12:30 | Lunch |
 | 12:30 - 14:00 | [Part II - Bayesian Workflow for Data Analysis](part-ii-workflow.html) |
 | 14:15 - 15:15 | [Part III - Bayesian Analysis with R](part-iii-brms-and-stan.html) |
-| 15:30 - 17:00 | Exercises with "brms" in R |
+| 15:30 - 17:00 | [Exercises with "brms" in R](exercises.html) |
 
 
 # Setup
