@@ -10,8 +10,8 @@ stringr
 forcats
 gghalves
 latex2exp
-glue
 broom
 patchwork
+glue
 Rcpp
 brms

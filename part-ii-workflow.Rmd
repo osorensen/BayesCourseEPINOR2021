@@ -26,11 +26,11 @@ library(latex2exp)
 ```
 
 
----
+
 
 class: inverse, middle, center
 
-# Part II - Bayesian Workflow for Data Analysis
+# Part II - Bayesian workflow for data analysis
 
 ```{r, message=FALSE, echo=FALSE}
 library(tidyverse)
@@ -74,7 +74,7 @@ theme_set(theme_classic())
 
 ---
 
-# Bayesian Workflow?
+# Bayesian workflow?
 
 Gelman et al. (2021) write
 
@@ -88,7 +88,7 @@ Gelman et al. (2021) write
 
 ---
 
-# Phases of a Statistical Workflow
+# Phases of a statistical workflow
 
 (a) Exploratory data analysis to aid in choosing initial model.
 
@@ -105,7 +105,7 @@ Gelman et al. (2021) write
 
 ---
 
-# Birth Weight Data
+# Birth weight data
 
 Data from Low Birth Weight Study, used by Hosmer and Lemeshow (2000).
 
@@ -122,7 +122,7 @@ head(dat)
 
 ---
 
-# Birth Weight Data
+# Birth weight data
 
 ```{r}
 head(dat)
@@ -136,7 +136,7 @@ head(dat)
 
 ---
 
-# Birth Weight Data
+# Birth weight data
 
 Research question:
 
@@ -327,7 +327,9 @@ Interaction might be useful?
 
 Prior predictive simulations:
 
-- Giving values to the parameters of the prior distribution is hard. We can circumvent the problem by rather looking at what type of data are implied by the prior.
+- Giving values to the parameters of the prior distribution is hard. 
+
+- We can circumvent the problem by rather looking at what type of data are implied by the prior.
 
 
 ---
@@ -486,7 +488,7 @@ ggplot(plot_df, aes(x = delta_w, y = odds_ratio, group = factor(beta), color = f
 ```
 ]
 
-We would probably give more than 19:1 odds that the odds ratio is lower than this!
+
 
 ---
 
@@ -594,7 +596,7 @@ If we have the prior $p(\beta_{LWT})$ and the likelihood $p(\text{data} | \beta_
 
 class: inverse
 
-# Monte Carlo Sampling?
+# Monte Carlo sampling?
 
 <center>
 <img src="figures/metropolis-hastings.jpg">
@@ -635,6 +637,19 @@ It should look random, like this.
 or the infant very hungry caterpillar
 <img src="figures/caterpillar.gif" height=100>
 
+---
+
+# (c) Check traceplot
+
+Not like this
+
+<center>
+<img src="figures/vehtari_trace.jpg" height="300">
+</center>
+
+
+.footnote[Taken from Figure 1 in Vehtari, Aki, Andrew Gelman, Daniel Simpson, Bob Carpenter, and Paul-Christian Bürkner. “Rank-Normalization, Folding, and Localization: An Improved Rˆ for Assessing Convergence of MCMC (with Discussion).” Bayesian Analysis 16, no. 2 (June 2021): 667–718. https://doi.org/10.1214/20-BA1221.
+]
 
 ---
 
@@ -657,7 +672,7 @@ In the end, all $\beta$ values give you the posterior distribution.
 .pull-right[
 
 
-```{r, echo=FALSE, dev='svg', fig.height=6, fig.width=6, fig.align='center'}
+```{r, echo=FALSE, dev='svg', fig.height=5, fig.width=5, fig.align='center'}
 target = function(x){
   if(x<0){
     return(0)}
@@ -681,24 +696,13 @@ easyMCMC = function(niter, startval, proposalsd){
   return(x)
 }
 
-z1=easyMCMC(1000,3,1)
-z2=easyMCMC(1000,3,10)
-z3=easyMCMC(1000,3,100)
-
 plot_df <- tibble(
-  Good = z1, Bad = z2, `Very bad` = z3,
-) %>% 
-  mutate(iteration = row_number()) %>% 
-  pivot_longer(cols = c("Good", "Bad", "Very bad")) %>% 
-  mutate(name = factor(name, levels = c("Good", "Bad", "Very bad")))
+  z = easyMCMC(50,3,1),
+  iteration = 1:50)
 
-p <- ggplot(plot_df, aes(x = iteration, y = value, group = name, color = name)) +
-  geom_line() + 
-  labs(color = NULL) + 
-  ylab(latex2exp::TeX("$\\beta$"))
-
-
-p
+ggplot(plot_df, aes(x = iteration, y = z)) + 
+  geom_point() + 
+  ylab(latex2exp::TeX("Random $\\beta$"))
 ```
 
 
@@ -708,25 +712,36 @@ p
 
 .footnote[Example based on [this blog post](https://stephens999.github.io/fiveMinuteStats/MH-examples1.html).]
 
+
 ---
 
-# Why is it bad?
+# Metropolis-Hastings
 
-.pull-left[
-```{r, echo=FALSE, dev='svg', fig.height=6, fig.width=6, fig.align='center'}
-p
+Take new random numbers some thousands of time, and you end up with "data" from the posterior distribution.
+
+```{r, echo=FALSE, dev='svg', fig.height=4, fig.width=5, fig.align='center'}
+plot_df <- tibble(
+  z = easyMCMC(5000,3,1),
+  iteration = 1:5000)
+
+ggplot(plot_df, aes(x = iteration, y = z)) + 
+  geom_point() + 
+  ylab(latex2exp::TeX("Random $\\beta$"))
 ```
 
-]
-.pull-right[
+---
 
-```{r, echo=FALSE, dev='svg', fig.height=5.5, fig.width=4, fig.align='center'}
-ggplot(plot_df, aes(x = value)) + 
-  geom_histogram(bins = 30) + 
-  facet_wrap(vars(name), ncol = 1)
+# Metropolis-Hastings
+
+And the data from the posterior distribution can be summarized in a histogram.
+
+```{r, echo=FALSE, dev='svg', fig.height=4, fig.width=5, fig.align='center'}
+
+ggplot(plot_df, aes(x = z)) + 
+  geom_histogram(bins = 50) + 
+  xlab(expression(beta))
 ```
 
-]
 
 
 ---
@@ -735,13 +750,14 @@ ggplot(plot_df, aes(x = value)) +
 
 Other things you might have to consider:
 
-- R-hat
+- R-hat $\hat{R}$
 
-- Autocorrelation
+  - Should be close to 1 when the chains have forgotten where they started. Then you're good.
 
-- Effective sample size
+- Effective sample size (ESS)
 
-- Divergent transitions
+  - How many uncorrelated samples do our correlated samples from the posterior correspond to?
+
 
 
 ---

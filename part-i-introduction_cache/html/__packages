@@ -11,3 +11,7 @@ forcats
 broom
 patchwork
 glue
+gghalves
+latex2exp
+Rcpp
+brms

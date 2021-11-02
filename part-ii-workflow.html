@@ -26,11 +26,11 @@ class: center, middle, inverse, title-slide
 
 
 
----
+
 
 class: inverse, middle, center
 
-# Part II - Bayesian Workflow for Data Analysis
+# Part II - Bayesian workflow for data analysis
 
 
 
@@ -71,7 +71,7 @@ class: inverse, middle, center
 
 ---
 
-# Bayesian Workflow?
+# Bayesian workflow?
 
 Gelman et al. (2021) write
 
@@ -85,7 +85,7 @@ Gelman et al. (2021) write
 
 ---
 
-# Phases of a Statistical Workflow
+# Phases of a statistical workflow
 
 (a) Exploratory data analysis to aid in choosing initial model.
 
@@ -102,7 +102,7 @@ Gelman et al. (2021) write
 
 ---
 
-# Birth Weight Data
+# Birth weight data
 
 Data from Low Birth Weight Study, used by Hosmer and Lemeshow (2000).
 
@@ -132,7 +132,7 @@ head(dat)
 
 ---
 
-# Birth Weight Data
+# Birth weight data
 
 
 ```r
@@ -159,7 +159,7 @@ head(dat)
 
 ---
 
-# Birth Weight Data
+# Birth weight data
 
 Research question:
 
@@ -270,7 +270,9 @@ Interaction might be useful?
 
 Prior predictive simulations:
 
-- Giving values to the parameters of the prior distribution is hard. We can circumvent the problem by rather looking at what type of data are implied by the prior.
+- Giving values to the parameters of the prior distribution is hard. 
+
+- We can circumvent the problem by rather looking at what type of data are implied by the prior.
 
 
 ---
@@ -361,7 +363,7 @@ It goes in the sensible direction, but the extreme ends are still crazy.
 &lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-23-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
-We would probably give more than 19:1 odds that the odds ratio is lower than this!
+
 
 ---
 
@@ -444,7 +446,7 @@ If we have the prior `\(p(\beta_{LWT})\)` and the likelihood `\(p(\text{data} | 
 
 class: inverse
 
-# Monte Carlo Sampling?
+# Monte Carlo sampling?
 
 &lt;center&gt;
 &lt;img src="figures/metropolis-hastings.jpg"&gt;
@@ -485,6 +487,19 @@ It should look random, like this.
 or the infant very hungry caterpillar
 &lt;img src="figures/caterpillar.gif" height=100&gt;
 
+---
+
+# (c) Check traceplot
+
+Not like this
+
+&lt;center&gt;
+&lt;img src="figures/vehtari_trace.jpg" height="300"&gt;
+&lt;/center&gt;
+
+
+.footnote[Taken from Figure 1 in Vehtari, Aki, Andrew Gelman, Daniel Simpson, Bob Carpenter, and Paul-Christian Bürkner. “Rank-Normalization, Folding, and Localization: An Improved Rˆ for Assessing Convergence of MCMC (with Discussion).” Bayesian Analysis 16, no. 2 (June 2021): 667–718. https://doi.org/10.1214/20-BA1221.
+]
 
 ---
 
@@ -516,19 +531,23 @@ In the end, all `\(\beta\)` values give you the posterior distribution.
 
 .footnote[Example based on [this blog post](https://stephens999.github.io/fiveMinuteStats/MH-examples1.html).]
 
+
 ---
 
-# Why is it bad?
+# Metropolis-Hastings
 
-.pull-left[
+Take new random numbers some thousands of time, and you end up with "data" from the posterior distribution.
+
 &lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-30-1.svg" style="display: block; margin: auto;" /&gt;
 
-]
-.pull-right[
+---
+
+# Metropolis-Hastings
+
+And the data from the posterior distribution can be summarized in a histogram.
 
 &lt;img src="part-ii-workflow_files/figure-html/unnamed-chunk-31-1.svg" style="display: block; margin: auto;" /&gt;
 
-]
 
 
 ---
@@ -537,13 +556,14 @@ In the end, all `\(\beta\)` values give you the posterior distribution.
 
 Other things you might have to consider:
 
-- R-hat
+- R-hat `\(\hat{R}\)`
 
-- Autocorrelation
+  - Should be close to 1 when the chains have forgotten where they started. Then you're good.
 
-- Effective sample size
+- Effective sample size (ESS)
 
-- Divergent transitions
+  - How many uncorrelated samples do our correlated samples from the posterior correspond to?
+
 
 
 ---
