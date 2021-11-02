@@ -13,7 +13,7 @@
 class: center, middle, inverse, title-slide
 
 # EPINOR Annual Meeting 2021
-## A Gentle Introduction to Bayesian Statistics
+## A gentle introduction to Bayesian statistics
 ### Øystein Sørensen
 ### Department of Psychology, University of Oslo
 ### 2021/11/02
@@ -24,7 +24,7 @@ class: center, middle, inverse, title-slide
 
 
 
-# Who Am I?
+# Who am I?
 
 - Associate professor in statistics at the Department of Psychology, University of Oslo.
 
@@ -32,12 +32,12 @@ class: center, middle, inverse, title-slide
 
 - Pragmatic user of both Bayesian and classical statistical methods.
 
-
+.footnote[https://osorensen.rbind.io/]
 
 ---
 
 
-# Plan for the Day
+# Plan for the day
 
 | Time | What |
 | --- | --- |
@@ -56,6 +56,24 @@ class: center, middle, inverse, title-slide
 
 ---
 
+# Goal for the day
+
+It takes years to master this, but I hope that you
+
+- get a feeling of what Bayesian statistics is
+
+- reflect over the difference between classical and Bayesian statistics
+
+- are ready to start developing models for your own projects
+
+- know where to look to learn more
+
+
+
+
+
+---
+
 # Setup
 
 For the R code in the presentations to work, we must run the following lines:
@@ -66,6 +84,8 @@ library(tidyverse)
 theme_set(theme_classic())
 ```
 
+For working with data in R, check out [R for Data Science](https://r4ds.had.co.nz/).
+
 
 .footnote[Wickham et al., (2019). Welcome to the Tidyverse. Journal of Open Source Software, 4(43), 1686, https://doi.org/10.21105/joss.01686]
 
@@ -74,20 +94,20 @@ theme_set(theme_classic())
 
 class: inverse, middle, center
 
-# Part I - Introduction to Bayesian Statistics
+# Part I - Introduction to Bayesian statistics
 
 ---
 
 
-# Outline for Part I
+# Outline for part I
 
 - A brief history
 
-- Two ways of quantifying evidence - Bayesianism vs frequentism
+- Two ways of quantifying evidence - Bayesianism and frequentism
 
 - Short break (5 min)
 
-- Priors and posteriors - a complete example with Bayesian linear regression
+- A fully worked example with Bayesian linear regression
 
 
 ---
@@ -109,15 +129,23 @@ class: inverse, middle, center
 
 &gt; If there be two subsequent events, the probability of the second b/N and the probability of both together P/N, and it being first discovered that the second event has also happened, from hence I guess that the first event has also happened, the probability I am right is P/b.
 
-With symbols
+.footnote[Stigler, S.M. (1982), Thomas Bayes's Bayesian Inference. Journal of the Royal Statistical Society: Series A (General), 145: 250-258. https://doi.org/10.2307/2981538.]
+
+---
+
+# Bayes' theorem
+
+With symbols (think B: positive test, A: actually sick)
 
 `$$P(A|B) = \frac{P(A \cap B)} {P(B)}$$`
 - `\(P(B)\)`: probability that the second event happened.
+
 - `\(P(A \cap B)\)`: probability that both events happened.
+
 - `\(P(A|B)\)`: probability that the first event happened, given that the second has happened.
 
 
-.footnote[Stigler, S.M. (1982), Thomas Bayes's Bayesian Inference. Journal of the Royal Statistical Society: Series A (General), 145: 250-258. https://doi.org/10.2307/2981538.]
+
 
 
 ---
@@ -158,28 +186,35 @@ For a random person taken from the population, what is the probability of diseas
 
 - Prevalence: `\(P(A)\)`. 
 
-- Positive test `\(P(B)\)`: 
+- Positive test `\(P(B)\)`
 
 --
 
-  - Hard enough to deserve it's own slide.
+Hard to know `\(P(B)\)` directly, but can show that
+
+`$$P(B)=1-P(\bar{B}|\bar{A}) + P(B|A)$$`
+
+
   
   
 ---
+
+exclude: true
   
 # Positive test
 
 - Total probability equals probability given sick plus probability given not sick. `\(\bar{A}\)` means "not A": 
   
 `$$P(B) = P(B|\bar{A}) + P(B|A)$$`
---
+
+
 
 - If you are not sick, you can either get a positive test `\(B\)` or a negative test `\(\bar{B}\)`, so
 
 `$$P(B|\bar{A}) + P(\bar{B}|\bar{A}) = 1$$`
 `$$P(B|\bar{A}) = 1- P(\bar{B}|\bar{A})$$`
   
---
+
   
 - We thus get 
 
@@ -211,14 +246,14 @@ Known things:
 
 ---
 
-# Bayes and Statistics
+# Bayes and statistics
 
 From 1761 and 200 years forward, Bayes' work did not have much influence on data analysis.
 
 
 ---
 
-# Bayes and Statistics
+# Bayes and statistics
 
 Statistics at the time was about counting.
 
@@ -234,18 +269,28 @@ Statistics at the time was about counting.
 
 ---
 
-# Bayes and Statistics
+# Bayes and statistics
 
-- Modern statistics founded by people like Karl Pearson, Sir Ronald Fisher, Egon Pearson, and Jerzy Neyman early in the 20th century.
+.pull-left[
 
-- So-called frequentist statistics, which is what most of you probably are most familiar with.
+- Modern statistics founded in early 20th century by people like Fisher, Pearson, and Neyman.
+
+- Frequentist statistics, with p-values, confidence intervals, hypothesis testing.
+
+]
+
+.pull-right[
+
+&lt;img src="figures/fisher_crop.jpeg"&gt;
+
+]
 
 
 ---
 
 class: inverse, middle, center 
 
-# Bayesian vs Frequentist Statistics
+# Bayesian and frequentist statistics
 
 
 
@@ -271,7 +316,7 @@ head(ToothGrowth)
 ## 6 10.0   VC  0.5
 ```
 
-- `len` is length of tooth in guinea pigs.
+- `len` is length of odontoblasts (cells responsible foro tooth growth) in guinea pigs.
 
 - `dose` is daily dose of vitamin C (mg/day)
 
@@ -293,7 +338,7 @@ There seems to be a positive relationship, but how do we quantify our uncertaint
 
 ---
 
-# Linear Regression
+# Linear regression
 
 Linear regression estimates effect of dose on length.
 
@@ -302,6 +347,7 @@ Linear regression estimates effect of dose on length.
 linreg &lt;- lm(len ~ dose, data = ToothGrowth)
 ```
 
+--
 
 
 ```r
@@ -339,12 +385,14 @@ And we can say:
 
 - If H0 is true and we take very many random datasets from the population, the magnitude `\(|\hat{\beta}|\)` would exceed 9.76 about `\(1.23 \times 10^{-14}\)` (0.00000000000123 %) of the times.
 
+--
+
 Hence, under H0 the expected **frequency** of seeing a deviation this big is `\(1.23 \times 10^{-14}\)`.
 
 
 ---
 
-# Significance Testing
+# Significance testing
 
 Magic 5 % cutoff for significance.
 
@@ -352,19 +400,22 @@ Magic 5 % cutoff for significance.
 &lt;img src="figures/sig_threshold.jpg" height=150&gt;
 &lt;/center&gt;
 
+- That is, if the expected **frequency** of seeing an effect this big, given H0 true, is below 5 %, we consider it good evidence against H0.
+
 .footnote[Cowles, M., &amp; Davis, C. (1982). On the origins of the .05 level of statistical significance. American Psychologist, 37(5), 553–558. https://doi.org/10.1037/0003-066X.37.5.553]
 
 ---
 
-# Some Points for Discussion
+# Some points for discussion
 
 - Is it ever possible that the null hypothesis is literally true? 
 
-  - Think of linear regression `\(y = \beta_{0} + \beta x + \epsilon\)` as an example, where `\(x\)` is some exposure and `\(y\)` is some outcome.
+  - Think of odds ratios, regression coefficients, whatever.
 
 --
 
 - What happens to p-values as we increase the sample size?
+
 
 ---
 
@@ -382,14 +433,27 @@ confint(linreg)
 ```
 
 
-- A 95% confidence interval is a thing which - when we repeatedly take random samples from the population - will contain the true value about 95% of the times.
+- A 95 % confidence interval is a thing which - when we repeatedly take random samples from the population - will contain the true value about 95 % of the times.
+
+--
+
+- From a mathematical viewpoint: for a given confidence interval, it is not 95 % chance that the true value is in it. It's either in or not, and the 95 % probability only applies to the hypothetical repeated sampling.
+
+- Note that the frequency thing is coming in all the time.
+
+
+---
+
+class: inverse, middle, center
+
+# What about the Bayesian interpretation?
 
 
 ---
 
 # Bayesian linear regression
 
-We have a linear model for the `ToothGrowth` data:
+We have a linear model for the ToothGrowth data:
 
 `$$y = \beta_{0} + \beta x + \epsilon$$`
 
@@ -401,12 +465,21 @@ We have a linear model for the `ToothGrowth` data:
 
 Can we use Bayes' theorem to say something about `\(\beta\)`?
 
+`$$P(A|B) = \frac{P(B|A)P(A)}{P(B)}$$`
+
+translates into
+
+
 `$$\underbrace{p(\beta | \text{data})}_{\color{red}{\text{want to know}}} = \underbrace{\frac{p(\beta) p(\text{data}|\beta)}{ p(\text{data})}}_{\color{red}{\text{know?}}}$$`
 
 "data" is just a shorthand for "observed lengths at given doses".
 
 
---
+---
+
+# Bayesian linear regression
+
+`$$\underbrace{p(\beta | \text{data})}_{\color{red}{\text{want to know}}} = \underbrace{\frac{p(\beta) p(\text{data}|\beta)}{ p(\text{data})}}_{\color{red}{\text{know?}}}$$`
 
 1. Our prior knowledge: `\(p(\beta)\)`
 
@@ -424,7 +497,7 @@ class: inverse, middle, center
 
 ---
 
-# Piece 1 - The Prior
+# Piece 1 - the prior
 
 - Quantifies our prior knowledge about the effect under study. 
 
@@ -440,7 +513,7 @@ class: inverse, middle, center
 
 ---
 
-# Piece 1 - The Prior
+# Piece 1 - the prior
 
 Assume we consider the biological nature of the problem, and find that `\(\beta\)`-values below -60 or above 60 are extremely unlikely. We also do not have any prior knowledge about the direction of the effect.
 
@@ -453,7 +526,7 @@ A convenient choice may then be a normal distribution with mean 0 and standard d
 
 ---
 
-# Piece 1 - The Prior
+# Piece 1 - the prior
 
 In the words of Greenland (2006), when the only parameter of interest is a  risk ratio
 
@@ -464,7 +537,7 @@ In the words of Greenland (2006), when the only parameter of interest is a  risk
 
 ---
 
-# Piece 1 - The Prior
+# Piece 1 - the prior
 
 Following Greenland, our normal prior for `\(\beta\)` implies that we would give 19:1 odds that the true slope is between -60 and 60.
 
@@ -480,7 +553,7 @@ Sometimes we have no idea, or we want to be "objective". Can use a uniform prior
 
 ---
 
-# Piece 2 - The Likelihood
+# Piece 2 - the likelihood
 
 
 .pull-left[
@@ -512,7 +585,7 @@ Sometimes we have no idea, or we want to be "objective". Can use a uniform prior
 
 layout: false
 
-# Piece 3 - Normalizing Constant
+# Piece 3 - normalizing constant
 
 The final piece is the normalizing constant, `\(p(\text{data})\)`:
 
@@ -525,7 +598,7 @@ and let the software deal with it.
 
 ---
 
-# Piece 3 - Normalizing Constant
+# Piece 3 - normalizing constant
 
 The funny sign `\(\propto\)` means *is proportional to*, and the lack of a normalizing constant means that we can get *unnormalized* probabilities. Example:
 
@@ -555,16 +628,27 @@ Normalization is straightforward in this case. We must divide each number by 4.5
 
 - Back to our linear regression. We have described the likelihood `\(p(\text{data}|\beta),\)` priors `\(p(\beta),\)` and the normalizing constant `\(p(\text{data})\)`. 
 
-- Estimates and confidence intervals look similar:
+.pull-left[
+- Estimates and intervals for `\(\beta\)` look very similar.
+
+- Interpretations are completely different!
+
+- Bayesian *posterior intervals* contain the true value with 95 % probability.
+
+]
+.pull-right[
 
 &lt;img src="figures/linear_model_comparison.png"&gt;
+
+]
+
 
 
 ---
 
-# Posterior Distribution
+# Posterior distribution
 
-- However, Bayesian models let us do much more afterwards, like plotting `\(p(\beta | \text{data})\)`
+- Bayesian models let us do much more afterwards, like plotting `\(p(\beta | \text{data})\)`
 
 &lt;center&gt;
 &lt;img src="figures/linear_model_posterior.png", width=400&gt;
@@ -572,7 +656,7 @@ Normalization is straightforward in this case. We must divide each number by 4.5
 
 ---
 
-# Posterior Distribution
+# Posterior distribution
 
 - Or asking: What is the probability that the true value of `\(\beta\)` is larger than 10?
 
@@ -585,7 +669,7 @@ Normalization is straightforward in this case. We must divide each number by 4.5
 
 ---
 
-# Posterior Distribution
+# Posterior distribution
 
 Again back to Greenland
 
@@ -597,7 +681,7 @@ This is the typical Bayesian interpretation of probability. Long term frequency 
 
 ---
 
-# Posterior Confidence Interval
+# Posterior interval
 
 The 95 % posterior interval for `\(\beta\)`, `\([7.8, 11.7]\)`, are such that after analyzing the data, we would give `\(19:1\)` odds that the true effect is between these two numbers.
 
@@ -606,6 +690,13 @@ The 95 % posterior interval for `\(\beta\)`, `\([7.8, 11.7]\)`, are such that af
 &lt;/center&gt;
 
 
+---
+
+class: inverse, middle, center
+
+Bayesian statistics is all about updating the prior probability by adding data.
+
+Demonstration follows.
 
 ---
 layout: true
@@ -647,22 +738,22 @@ layout: true
 layout: false
 class: inverse, middle, center
 
-# Summary of Bayesian vs Frequentist Statistics
+# Summary of Bayesian and frequentist statistics
 
 
 ---
 
-# Bayesian vs Frequentist Statistics
+# Bayesian and frequentist statistics
 
 - Frequentist
 
   - p-values interpreted in light of "how often would this happen if H0 was true and we sampled data again and again"?
   
-  - Similarly for confidence intervals
+  - Confidence intervals also defined in terms of hypothetical repeated sampling.
   
 - Bayesian
 
-  - Posterior distribution quantifies our degree of belief after seeing the data. Should agree with frequentist values if we sample data again and again.
+  - Posterior distribution quantifies our degree of belief after seeing the data. However, if we did sample new datasets again and again from the population, a 95 % posterior interval should be correct about 95 % of the time, etc.
   
   - Requires specifying the prior distribution, and works less out-of-the-box.
   
