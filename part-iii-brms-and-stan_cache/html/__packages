@@ -10,4 +10,5 @@ stringr
 forcats
 Rcpp
 brms
+shiny
 glue

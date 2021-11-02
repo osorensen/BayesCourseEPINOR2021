@@ -23,6 +23,8 @@ The tentative plan for the day is as follows. Click on the links to see the pres
 | 15:30 - 17:00 | [Exercises with "brms" in R](exercises.html) |
 
 
+
+
 # Setup
 
 If you want to follow the last session, "Exercises with 'brms' in R", please follow the instructions here to make sure your system is properly set up. Installing 'brms' is slightly more complicated than installing most other R packages, and I will of course also help with this on-site.

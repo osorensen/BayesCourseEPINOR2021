@@ -1,6 +1,6 @@
 ---
 title: "EPINOR Annual Meeting 2021"
-subtitle: "Part III - Bayesian Analysis with R"
+subtitle: "Part III - Bayesian analysis with R"
 author: "Øystein Sørensen"
 institute: "University of Oslo"
 date: "2021/11/02"
@@ -25,7 +25,7 @@ theme_set(theme_bw())
 
 
 
-# Outline for Part III
+# Outline for part III
 
 - An overview of tools for Bayesian analysis in R
 
@@ -37,14 +37,14 @@ theme_set(theme_bw())
 
 ---
 
-# Fitting Bayesian Models
+# Fitting Bayesian models
 
 .pull-left[
 - Computation for Bayesian models requires more expertise than fitting frequentist models. 
 
 - Series of papers by Greenland written 10-15 years ago contain lots of tricks for approximately fitting Bayesian models using familiar software.
 
-- In contrast, fairly complex mixed models can be estimated with a single line of code or the press of a button, e.g., mixed models, Cox regression.
+- In contrast, fairly complex frequentist models can be estimated with a single line of code or the press of a button, e.g., mixed models, Cox regression.
 
 ]
 .pull-right[
@@ -58,7 +58,7 @@ theme_set(theme_bw())
 
 ---
 
-# Software for Fitting Bayesian Models
+# Software for fitting Bayesian models
 
 - Several attempts at making this process easier.
 
@@ -81,7 +81,7 @@ theme_set(theme_bw())
 
 ---
 
-# Fitting Bayesian Models
+# Fitting Bayesian models
 
 - Stan is a programming language of its own, definitely increasing the barrier for easy learning.
 
@@ -213,7 +213,7 @@ class: inverse, middle, center
 
 ---
 
-# (a) Exploratory Data Analysis
+# (a) Exploratory data analysis
 
 - Important, but not particularly related to brms. 
 
@@ -223,7 +223,7 @@ class: inverse, middle, center
 
 ---
 
-# (b) Prior Distribution
+# (b) Prior distribution
 
 In the previous lecture we decided on using a normal prior for $\beta_{LWT}$ with mean 0 and standard deviation 0.4.
 
@@ -241,7 +241,7 @@ print(prior, show_df = FALSE)
 
 ---
 
-# (b) Prior Distribution
+# (b) Prior distribution
 
 Update to get what we want:
 
@@ -515,7 +515,7 @@ mcmc_plot(mod2)
 
 ---
 
-# Joint Posterior Density
+# Joint posterior density
 
 ```{r, dev='svg', fig.height=4, fig.width=6}
 mcmc_plot(mod2, variable = c("b_LWT", "b_SmokerTRUE"), 
@@ -524,7 +524,7 @@ mcmc_plot(mod2, variable = c("b_LWT", "b_SmokerTRUE"),
 
 ---
 
-# Joint Posterior Density
+# Joint posterior density
 
 ```{r, dev='svg', fig.height=4, fig.width=6}
 mcmc_plot(mod2, type = "pairs")
@@ -532,7 +532,7 @@ mcmc_plot(mod2, type = "pairs")
 
 ---
 
-# Joint Posterior Density
+# Joint posterior density
 
 What's the probability the both $\beta_{LWT} > 0$ and $\beta_{Smoker} < 0$, i.e., that smoking is protective and the probability of low birthweight increases with mother's weight?
 
@@ -544,7 +544,7 @@ head(df)
 
 ---
 
-# Joint Posterior Density
+# Joint posterior density
 
 Let's do this carefully. First select columns.
 
@@ -557,7 +557,7 @@ df %>%
 
 ---
 
-# Joint Posterior Density
+# Joint posterior density
 
 Label the ones that meet our criteria.
 
@@ -571,7 +571,7 @@ df %>%
 
 ---
 
-# Joint Posterior Density
+# Joint posterior density
 
 Find the proportion of samples from posterior distribution that meets the criteria.
 
@@ -585,7 +585,7 @@ df %>%
 
 ---
 
-# Joint Posterior Density
+# Joint posterior density
 
 What's the probability that the odds ratio associated with a 1 kg difference in mother's weight is between 0.99 and 1.01?
 
@@ -601,7 +601,7 @@ df %>%
 
 ---
 
-# Joint Posterior Density
+# Joint posterior density
 
 Find proportion that meets criteria
 
@@ -621,7 +621,7 @@ This is the posterior probability that the odds ratio is between 0.99 and 1.01.
 
 ---
 
-# Bayes Factors
+# Bayes factors
 
 - A Bayesian alternative to hypothesis testing: compare the posterior probabilities of two models.
 
@@ -639,7 +639,7 @@ bayes_factor(mod, mod2)
 
 ---
 
-# Bayes Factors - Proving the null
+# Bayes factors - proving the null
 
 <center>
 <img src="figures/nyberg_edu.jpg" width=500>
@@ -650,7 +650,7 @@ bayes_factor(mod, mod2)
 
 ---
 
-# Bayes Factors - Proving the null
+# Bayes factors - proving the null
 
 From the Nyberg et al. paper:
 
@@ -674,6 +674,26 @@ class: inverse, middle, center
 # Was all of this worth the effort?
 
 Maybe not in this particular case, but Bayesian models can easily be extended.
+
+
+---
+
+# Data integration
+
+Assume we got other birthweight dataset, from Norway, South Africa, Chile, Japan. Assuming that the effects are the same in all of these populations seems a bit strong.
+
+We could "easily" extend the logistic regression to a hierarchical model:
+
+- $\beta_{LWT}$, average effect of birthweight "in the world".
+
+- $\beta_{a,LWT}$, effect of birthweight in country $a$. We would add an additional layer of hyperpriors to reflect that each subpopulation deviates from the whole world.
+
+Something like this would get us started:
+
+```{r, eval=FALSE}
+mod <- brm(Low ~ LWT + Smoker + (LWT + Smoker | Country),
+           data = dat, family = bernoulli())
+```
 
 
 
@@ -707,7 +727,7 @@ Using measurements $w$ lead to bias in $\beta$. Quite straightforward to take in
 
 ---
 
-# Missing Data
+# Missing data
 
 What if data are missing?
 
@@ -718,11 +738,11 @@ See, e.g., [the mice package](https://CRAN.R-project.org/package=mice).
 
 ---
 
-# Hierarchical Models
+# Longitudinal data
 
 - Longitudinal designs with repeated measurements
 
-- Other grouping structures (students nested in classes nested in schools)
+
 
 .pull-left[
 Example in brms. Linear mixed model with random slopes.
@@ -756,7 +776,9 @@ tibble(
     y = (1 + b1) * tp + b0 + rnorm(nrow(.))
   ) %>% 
   ggplot(aes(x = tp, y = y, group = id)) + 
-  geom_line()
+  geom_line() + 
+  geom_point() + 
+  theme_bw()
 ```
 
 
@@ -767,7 +789,7 @@ tibble(
 
 ---
 
-# Philosophical Issues
+# Philosophical issues
 
 - Statistical methods and analysis workflows relate the philosophy of science.
 
